@@ -5,7 +5,7 @@ import os.path
 
 
 setup(name='tap-gitlab',
-      version='0.1.0',
+      version='0.1.1',
       description='Taps GitLab data',
       author='Stitch',
       url='https://github.com/stitchstreams/tap-gitlab',
@@ -23,6 +23,12 @@ setup(name='tap-gitlab',
       packages=['tap_gitlab'],
       package_data = {
           'tap_gitlab': [
+            "branches.json",
+            "commits.json",
+            "issues.json",
+            "milestones.json",
+            "projects.json",
+            "users.json",
           ],
       }
 )
