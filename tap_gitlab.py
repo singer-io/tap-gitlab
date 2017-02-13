@@ -179,7 +179,11 @@ def _sync_subresource(resource, project, add_id=False, save_ids=False, transform
 
 
 def flatten_id(item, target):
-    item[target + '_id'] = item.pop(target, {}).pop('id', None)
+    if target in item and item[target] is not None:
+        item[target + '_id'] = item.pop(target, {}).pop('id', None)
+    else:
+        item[target + '_id'] = None
+
     return item
 
 
@@ -264,15 +268,16 @@ def main():
     with open(args.config) as f:
         config = json.load(f)
 
-    BASE_URL = config.get('url', DEFAULT_URL)
+    BASE_URL = config.get('api_url', DEFAULT_URL)
     PRIVATE_TOKEN = config['private_token']
+    projects = [s.strip() for s in config['projects'].split(' ')]
 
     if args.state:
         logger.info("Loading state from " + args.state)
         with open(args.state) as f:
             state.update(json.load(f))
 
-    do_sync(config['projects'])
+    do_sync(projects)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ import os.path
 
 
 setup(name='tap-gitlab',
-      version='0.1.1',
+      version='0.1.2',
       description='Taps GitLab data',
       author='Stitch',
       url='https://github.com/stitchstreams/tap-gitlab',
