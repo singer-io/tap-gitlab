@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
-import os.path
-
+from setuptools import setup
 
 setup(name='tap-gitlab',
-      version='0.1.2',
-      description='Taps GitLab data',
+      version='0.2.0',
+      description='Singer.io tap for extracting data from the GitLab API',
       author='Stitch',
-      url='https://github.com/stitchstreams/tap-gitlab',
+      url='https://singer.io',
       classifiers=['Programming Language :: Python :: 3 :: Only'],
       py_modules=['tap_gitlab'],
       install_requires=[
-          'stitchstream-python>=0.5.0',
+          'singer-python>=0.1.0',
           'requests==2.12.4',
           'strict-rfc3339==0.7',
       ],
@@ -22,7 +20,7 @@ setup(name='tap-gitlab',
       ''',
       packages=['tap_gitlab'],
       package_data = {
-          'tap_gitlab': [
+          'tap_gitlab/schemas': [
             "branches.json",
             "commits.json",
             "issues.json",
@@ -30,5 +28,6 @@ setup(name='tap-gitlab',
             "projects.json",
             "users.json",
           ],
-      }
+      },
+      include_package_data=True,
 )
