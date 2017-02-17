@@ -10,7 +10,7 @@ from .transform import transform_row
 
 
 PER_PAGE = 100
-CONFIG {
+CONFIG = {
     'api_url': "https://gitlab.com/api/v3",
     'private_token': None,
 }
@@ -46,8 +46,15 @@ RESOURCES = {
 logger = singer.get_logger()
 
 
+def get_url(entity, pid):
+    if isinstance(pid, (unicode, str)):
+        pid = pid.replace("/", "%2F")
+
+    return CONFIG['api_url'] + RESOURCES[entity]['url'].format(pid)
+
+
 def get_start(entity):
-    is entity not in STATE:
+    if entity not in STATE:
         STATE[entity] = utils.strftime(datetime.datetime.utcnow() - datetime.timedelta(days=365))
 
     return STATE[entity]
@@ -55,7 +62,7 @@ def get_start(entity):
 
 def request(url, params=None):
     params = params or {}
-    params['private_token'] = PRIVATE_TOKEN
+    params['private_token'] = CONFIG['private_token']
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response
@@ -84,7 +91,7 @@ def flatten_id(item, target):
 
 
 def sync_branches(project):
-    url = BASE_URL + RESOURCES["branches"]["url"].format(project["id"])
+    url = get_url("branches", project['id'])
     for row in gen_request(url):
         row['project["id"]'] = project["id"]
         flatten_id(row, "commit")
@@ -93,15 +100,15 @@ def sync_branches(project):
 
 
 def sync_commits(project):
-    url = BASE_URL + RESOURCES["commits"]["url"].format(project["id"])
+    url = get_url("commits", project['id'])
     for row in gen_request(url):
         row['project["id"]'] = project["id"]
-        row = transform_row(row, RESOURCES["commits"]["url"])
+        row = transform_row(row, RESOURCES["commits"]["schema"])
         singer.write_record("commits", row)
 
 
 def sync_issues(project):
-    url = BASE_URL + RESOURCES["issues"]["url"].format(project["id"])
+    url = get_url("issues", project['id'])
     for row in gen_request(url):
         flatten_id(row, "author")
         flatten_id(row, "assignee")
@@ -112,7 +119,7 @@ def sync_issues(project):
 
 
 def sync_milestones(project):
-    url = BASE_URL + RESOURCES["issues"]["url"].format(project["id"])
+    url = get_url("milestones", project['id'])
     for row in gen_request(url):
         row = transform_row(row, RESOURCES["milestones"]["schema"])
         if row["updated_at"] >= get_start("project_{}".format(project["id"])):
@@ -120,7 +127,7 @@ def sync_milestones(project):
 
 
 def sync_users(project):
-    url = BASE_URL + RESOURCES["issues"]["url"].format(project['id'])
+    url = get_url("users", project['id'])
     project["users"] = []
     for row in gen_request(url):
         row = transform_row(row, RESOURCES["users"]["schema"])
@@ -129,10 +136,7 @@ def sync_users(project):
 
 
 def sync_project(pid):
-    if isinstance(pid, str):
-        pid = pid.replace("/", "%2F")
-
-    url = BASE_URL + RESOURCES["projects"]["url"].format(id=pid)
+    url = get_url("projects", pid)
     data = request(url).json()
 
     flatten_id(data, "owner")

@@ -7,7 +7,7 @@ class InvalidData(Exception):
     """Raise when data doesn't validate the schema"""
 
 
-def transform_row(row, schem):
+def transform_row(row, schema):
     return _transform_field(row, schema)
 
 
@@ -18,8 +18,8 @@ def _transform_datetime(value):
 def _anyOf(data, schema_list):
     for schema in schema_list:
         try:
-            return transform_field(data, schema)
-        except:
+            return _transform_field(data, schema)
+        except Exception as e:
             pass
 
     raise InvalidData("{} doesn't match any of {}".format(data, schema_list))
