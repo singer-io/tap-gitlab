@@ -47,7 +47,7 @@ logger = singer.get_logger()
 
 
 def get_url(entity, pid):
-    if isinstance(pid, (str, bytes)):
+    if not isinstance(pid, int):
         pid = pid.replace("/", "%2F")
 
     return CONFIG['api_url'] + RESOURCES[entity]['url'].format(pid)
@@ -156,12 +156,16 @@ def sync_project(pid):
 
 
 def do_sync(pids):
+    logger.info("Starting sync")
+
     for resource, config in RESOURCES.items():
         config['schema'] = utils.load_schema(resource)
         singer.write_schema(resource, config['schema'], config['key_properties'])
 
     for pid in pids:
         sync_project(pid)
+
+    logger.info("Sync complete")
 
 
 def main():
