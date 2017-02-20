@@ -47,7 +47,7 @@ logger = singer.get_logger()
 
 
 def get_url(entity, pid):
-    if isinstance(pid, (unicode, str)):
+    if isinstance(pid, (str, bytes)):
         pid = pid.replace("/", "%2F")
 
     return CONFIG['api_url'] + RESOURCES[entity]['url'].format(pid)
