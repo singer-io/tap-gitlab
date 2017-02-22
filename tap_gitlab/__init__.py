@@ -93,7 +93,7 @@ def flatten_id(item, target):
 def sync_branches(project):
     url = get_url("branches", project['id'])
     for row in gen_request(url):
-        row['project["id"]'] = project["id"]
+        row['project_id'] = project['id']
         flatten_id(row, "commit")
         row = transform_row(row, RESOURCES["branches"]["schema"])
         singer.write_record("branches", row)
