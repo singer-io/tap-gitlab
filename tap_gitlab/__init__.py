@@ -13,6 +13,7 @@ PER_PAGE = 100
 CONFIG = {
     'api_url': "https://gitlab.com/api/v3",
     'private_token': None,
+    'start_date': None,
 }
 STATE = {}
 
@@ -55,7 +56,7 @@ def get_url(entity, pid):
 
 def get_start(entity):
     if entity not in STATE:
-        STATE[entity] = utils.strftime(datetime.datetime.utcnow() - datetime.timedelta(days=365))
+        STATE[entity] = CONFIG['start_date']
 
     return STATE[entity]
 
@@ -172,7 +173,7 @@ def main():
     args = utils.parse_args()
 
     config = utils.load_json(args.config)
-    utils.check_config(config, ["private_token", "projects"])
+    utils.check_config(config, ["private_token", "projects", "start_date"])
     CONFIG.update(config)
 
     if args.state:
