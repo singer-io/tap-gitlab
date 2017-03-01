@@ -20,26 +20,32 @@ STATE = {}
 RESOURCES = {
     'projects': {
         'url': '/projects/{}',
+        'schema': utils.load_schema('projects'),
         'key_properties': ['id'],
     },
     'branches': {
         'url': '/projects/{}/repository/branches',
+        'schema': utils.load_schema('branches'),
         'key_properties': ['project_id', 'name'],
     },
     'commits': {
         'url': '/projects/{}/repository/commits',
+        'schema': utils.load_schema('commits'),
         'key_properties': ['id'],
     },
     'issues': {
         'url': '/projects/{}/issues',
+        'schema': utils.load_schema('issues'),
         'key_properties': ['id'],
     },
     'milestones': {
         'url': '/projects/{}/milestones',
+        'schema': utils.load_schema('milestones'),
         'key_properties': ['id'],
     },
     'users': {
         'url': '/projects/{}/users',
+        'schema': utils.load_schema('users'),
         'key_properties': ['id'],
     },
 }
@@ -103,7 +109,7 @@ def sync_branches(project):
 def sync_commits(project):
     url = get_url("commits", project['id'])
     for row in gen_request(url):
-        row['project["id"]'] = project["id"]
+        row['project_id'] = project["id"]
         row = transform_row(row, RESOURCES["commits"]["schema"])
         singer.write_record("commits", row)
 
@@ -144,7 +150,8 @@ def sync_project(pid):
     project = transform_row(data, RESOURCES["projects"]["schema"])
 
     state_key = "project_{}".format(project["id"])
-    if project['last_activity_at'] >= get_start(state_key):
+    last_activity_at = project.get('last_activity_at', project.get('created_at'))
+    if last_activity_at >= get_start(state_key):
         sync_branches(project)
         sync_commits(project)
         sync_issues(project)
@@ -152,7 +159,7 @@ def sync_project(pid):
         sync_users(project)
 
         singer.write_record("projects", project)
-        utils.update_state(STATE, state_key, project["last_activity_at"])
+        utils.update_state(STATE, state_key, last_activity_at)
         singer.write_state(STATE)
 
 
@@ -160,7 +167,6 @@ def do_sync(pids):
     logger.info("Starting sync")
 
     for resource, config in RESOURCES.items():
-        config['schema'] = utils.load_schema(resource)
         singer.write_schema(resource, config['schema'], config['key_properties'])
 
     for pid in pids:
