@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+import sys
 
 import requests
 import singer
@@ -51,6 +52,7 @@ RESOURCES = {
 }
 
 logger = singer.get_logger()
+session = requests.Session()
 
 
 def get_url(entity, pid):
@@ -70,9 +72,15 @@ def get_start(entity):
 def request(url, params=None):
     params = params or {}
     params['private_token'] = CONFIG['private_token']
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    return response
+    req = requests.Request('GET', url, params=params).prepare()
+    logger.info("GET {}".format(req.url))
+    resp = session.send(req)
+
+    if resp.status_code >= 400:
+        logger.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
+        sys.exit(1)
+
+    return resp
 
 
 def gen_request(url):
