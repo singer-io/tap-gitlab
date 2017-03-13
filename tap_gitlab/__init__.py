@@ -2,11 +2,12 @@
 
 import datetime
 import sys
+import os
 
 import requests
 import singer
 
-from . import utils
+from singer import utils
 from .transform import transform_row
 
 
@@ -18,35 +19,41 @@ CONFIG = {
 }
 STATE = {}
 
+def get_abs_path(path):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+def load_schema(entity):
+    return utils.load_json(get_abs_path("schemas/{}.json".format(entity)))
+
 RESOURCES = {
     'projects': {
         'url': '/projects/{}',
-        'schema': utils.load_schema('projects'),
+        'schema': load_schema('projects'),
         'key_properties': ['id'],
     },
     'branches': {
         'url': '/projects/{}/repository/branches',
-        'schema': utils.load_schema('branches'),
+        'schema': load_schema('branches'),
         'key_properties': ['project_id', 'name'],
     },
     'commits': {
         'url': '/projects/{}/repository/commits',
-        'schema': utils.load_schema('commits'),
+        'schema': load_schema('commits'),
         'key_properties': ['id'],
     },
     'issues': {
         'url': '/projects/{}/issues',
-        'schema': utils.load_schema('issues'),
+        'schema': load_schema('issues'),
         'key_properties': ['id'],
     },
     'milestones': {
         'url': '/projects/{}/milestones',
-        'schema': utils.load_schema('milestones'),
+        'schema': load_schema('milestones'),
         'key_properties': ['id'],
     },
     'users': {
         'url': '/projects/{}/users',
-        'schema': utils.load_schema('users'),
+        'schema': load_schema('users'),
         'key_properties': ['id'],
     },
 }
@@ -191,14 +198,12 @@ def do_sync(pids):
 
 
 def main():
-    args = utils.parse_args()
+    config, state = utils.parse_args(["private_token", "projects", "start_date"])
 
-    config = utils.load_json(args.config)
-    utils.check_config(config, ["private_token", "projects", "start_date"])
     CONFIG.update(config)
 
-    if args.state:
-        STATE.update(utils.load_json(args.state))
+    if state:
+        STATE.update(utils.load_json(state))
 
     do_sync(CONFIG['projects'].split(' '))
 
