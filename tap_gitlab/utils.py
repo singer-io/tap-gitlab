@@ -7,6 +7,7 @@ import threading
 
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
+#pylint: disable=invalid-name
 
 def strptime(dt):
     return datetime.datetime.strptime(dt, DATETIME_FMT)
@@ -29,7 +30,7 @@ def ratelimit(limit, every):
                 timer = threading.Timer(every, semaphore.release)
                 timer.setDaemon(True)  # allows the timer to be canceled on exit
                 timer.start()
-                return result
+            return result
 
         return wrapper
 

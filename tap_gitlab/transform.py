@@ -14,12 +14,12 @@ def transform_row(row, schema):
 def _transform_datetime(value):
     return utils.strftime(datetime.datetime.utcfromtimestamp(rfc3339_to_timestamp(value)))
 
-
+#pylint: disable=invalid-name
 def _anyOf(data, schema_list):
     for schema in schema_list:
         try:
             return _transform_field(data, schema)
-        except Exception as e:
+        except: #pylint: disable=bare-except
             pass
 
     raise InvalidData("{} doesn't match any of {}".format(data, schema_list))
@@ -40,7 +40,7 @@ def _type_transform(value, type_schema):
         for typ in type_schema:
             try:
                 return _type_transform(value, typ)
-            except:
+            except: #pylint: disable=bare-except
                 pass
 
         raise InvalidData("{} doesn't match any of {}".format(value, type_schema))
