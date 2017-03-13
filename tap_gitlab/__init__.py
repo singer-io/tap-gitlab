@@ -58,9 +58,9 @@ RESOURCES = {
     },
 }
 
-#pylint: disable=invalid-name
-logger = singer.get_logger()
-session = requests.Session()
+
+LOGGER = singer.get_logger()
+SESSION = requests.Session()
 
 
 def get_url(entity, pid):
@@ -86,11 +86,11 @@ def request(url, params=None):
         headers['User-Agent'] = CONFIG['user_agent']
 
     req = requests.Request('GET', url, params=params, headers=headers).prepare()
-    logger.info("GET {}".format(req.url))
-    resp = session.send(req)
+    LOGGER.info("GET {}".format(req.url))
+    resp = SESSION.send(req)
 
     if resp.status_code >= 400:
-        logger.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
+        LOGGER.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
         sys.exit(1)
 
     return resp
@@ -186,7 +186,7 @@ def sync_project(pid):
 
 
 def do_sync(pids):
-    logger.info("Starting sync")
+    LOGGER.info("Starting sync")
 
     for resource, config in RESOURCES.items():
         singer.write_schema(resource, config['schema'], config['key_properties'])
@@ -194,7 +194,7 @@ def do_sync(pids):
     for pid in pids:
         sync_project(pid)
 
-    logger.info("Sync complete")
+    LOGGER.info("Sync complete")
 
 
 def main():
