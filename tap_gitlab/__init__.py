@@ -2,11 +2,12 @@
 
 import datetime
 import sys
+import os
 
 import requests
 import singer
 
-from . import utils
+from singer import utils
 from .transform import transform_row
 
 
@@ -18,41 +19,48 @@ CONFIG = {
 }
 STATE = {}
 
+def get_abs_path(path):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+def load_schema(entity):
+    return utils.load_json(get_abs_path("schemas/{}.json".format(entity)))
+
 RESOURCES = {
     'projects': {
         'url': '/projects/{}',
-        'schema': utils.load_schema('projects'),
+        'schema': load_schema('projects'),
         'key_properties': ['id'],
     },
     'branches': {
         'url': '/projects/{}/repository/branches',
-        'schema': utils.load_schema('branches'),
+        'schema': load_schema('branches'),
         'key_properties': ['project_id', 'name'],
     },
     'commits': {
         'url': '/projects/{}/repository/commits',
-        'schema': utils.load_schema('commits'),
+        'schema': load_schema('commits'),
         'key_properties': ['id'],
     },
     'issues': {
         'url': '/projects/{}/issues',
-        'schema': utils.load_schema('issues'),
+        'schema': load_schema('issues'),
         'key_properties': ['id'],
     },
     'milestones': {
         'url': '/projects/{}/milestones',
-        'schema': utils.load_schema('milestones'),
+        'schema': load_schema('milestones'),
         'key_properties': ['id'],
     },
     'users': {
         'url': '/projects/{}/users',
-        'schema': utils.load_schema('users'),
+        'schema': load_schema('users'),
         'key_properties': ['id'],
     },
 }
 
-logger = singer.get_logger()
-session = requests.Session()
+
+LOGGER = singer.get_logger()
+SESSION = requests.Session()
 
 
 def get_url(entity, pid):
@@ -78,11 +86,11 @@ def request(url, params=None):
         headers['User-Agent'] = CONFIG['user_agent']
 
     req = requests.Request('GET', url, params=params, headers=headers).prepare()
-    logger.info("GET {}".format(req.url))
-    resp = session.send(req)
+    LOGGER.info("GET {}".format(req.url))
+    resp = SESSION.send(req)
 
     if resp.status_code >= 400:
-        logger.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
+        LOGGER.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
         sys.exit(1)
 
     return resp
@@ -163,6 +171,7 @@ def sync_project(pid):
     project = transform_row(data, RESOURCES["projects"]["schema"])
 
     state_key = "project_{}".format(project["id"])
+    #pylint: disable=maybe-no-member
     last_activity_at = project.get('last_activity_at', project.get('created_at'))
     if last_activity_at >= get_start(state_key):
         sync_branches(project)
@@ -177,7 +186,7 @@ def sync_project(pid):
 
 
 def do_sync(pids):
-    logger.info("Starting sync")
+    LOGGER.info("Starting sync")
 
     for resource, config in RESOURCES.items():
         singer.write_schema(resource, config['schema'], config['key_properties'])
@@ -185,18 +194,16 @@ def do_sync(pids):
     for pid in pids:
         sync_project(pid)
 
-    logger.info("Sync complete")
+    LOGGER.info("Sync complete")
 
 
 def main():
-    args = utils.parse_args()
+    config, state = utils.parse_args(["private_token", "projects", "start_date"])
 
-    config = utils.load_json(args.config)
-    utils.check_config(config, ["private_token", "projects", "start_date"])
     CONFIG.update(config)
 
-    if args.state:
-        STATE.update(utils.load_json(args.state))
+    if state:
+        STATE.update(utils.load_json(state))
 
     do_sync(CONFIG['projects'].split(' '))
 
