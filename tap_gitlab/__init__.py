@@ -203,7 +203,7 @@ def main():
     CONFIG.update(config)
 
     if state:
-        STATE.update(utils.load_json(state))
+        STATE.update(state)
 
     do_sync(CONFIG['projects'].split(' '))
 
