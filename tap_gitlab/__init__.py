@@ -171,9 +171,18 @@ def sync_project(pid):
     project = transform_row(data, RESOURCES["projects"]["schema"])
 
     state_key = "project_{}".format(project["id"])
+
     #pylint: disable=maybe-no-member
     last_activity_at = project.get('last_activity_at', project.get('created_at'))
-    if last_activity_at >= get_start(state_key):
+    if not last_activity_at:
+        raise Exception(
+            #pylint: disable=line-too-long
+            "There is no last_activity_at or created_at field on project {}. This usually means I don't have access to the project."
+            .format(project['id']))
+
+
+    if project['last_activity_at'] >= get_start(state_key):
+
         sync_branches(project)
         sync_commits(project)
         sync_issues(project)

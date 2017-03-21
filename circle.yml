@@ -8,4 +8,4 @@ dependencies:
 
 test:
   post:
-    - pylint tap_gitlab --disable missing-docstring,logging-format-interpolation
+    - pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled
