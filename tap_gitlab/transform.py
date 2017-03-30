@@ -52,7 +52,7 @@ def _type_transform(value, type_schema):
             return None
 
     if type_schema == "string":
-        return str(value)
+        return u"{}".format(value)
 
     if type_schema == "integer":
         return int(value)
