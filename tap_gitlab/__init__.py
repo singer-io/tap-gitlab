@@ -207,12 +207,12 @@ def do_sync(pids):
 
 
 def main():
-    config, state = utils.parse_args(["private_token", "projects", "start_date"])
+    args = utils.parse_args(["private_token", "projects", "start_date"])
 
-    CONFIG.update(config)
+    CONFIG.update(args.config)
 
     if state:
-        STATE.update(state)
+        STATE.update(args.state)
 
     do_sync(CONFIG['projects'].split(' '))
 
