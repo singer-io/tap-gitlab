@@ -211,7 +211,7 @@ def main():
 
     CONFIG.update(args.config)
 
-    if state:
+    if args.state:
         STATE.update(args.state)
 
     do_sync(CONFIG['projects'].split(' '))
