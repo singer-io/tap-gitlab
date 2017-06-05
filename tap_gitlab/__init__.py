@@ -4,6 +4,7 @@ import datetime
 import sys
 import os
 
+import backoff
 import requests
 import singer
 
@@ -77,6 +78,11 @@ def get_start(entity):
     return STATE[entity]
 
 
+@backoff.on_exception(backoff.expo,
+                      (requests.exceptions.RequestException),
+                      max_tries=5,
+                      giveup=lambda e: e.response is not None and 400 <= e.response.status_code < 500,
+                      factor=2)
 def request(url, params=None):
     params = params or {}
     params['private_token'] = CONFIG['private_token']
