@@ -81,7 +81,7 @@ def get_start(entity):
 @backoff.on_exception(backoff.expo,
                       (requests.exceptions.RequestException),
                       max_tries=5,
-                      giveup=lambda e: e.response is not None and 400 <= e.response.status_code < 500,
+                      giveup=lambda e: e.response is not None and 400 <= e.response.status_code < 500, # pylint: disable=line-too-long
                       factor=2)
 def request(url, params=None):
     params = params or {}
@@ -96,7 +96,9 @@ def request(url, params=None):
     resp = SESSION.send(req)
 
     if resp.status_code >= 400:
-        LOGGER.critical("Error making request to GitLab API: GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
+        LOGGER.critical(
+            "Error making request to GitLab API: GET {} [{} - {}]".format(
+                req.url, resp.status_code, resp.content))
         sys.exit(1)
 
     return resp
