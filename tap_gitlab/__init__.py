@@ -96,7 +96,7 @@ def request(url, params=None):
     resp = SESSION.send(req)
 
     if resp.status_code >= 400:
-        LOGGER.error("GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
+        LOGGER.critical("Error making request to GitLab API: GET {} [{} - {}]".format(req.url, resp.status_code, resp.content))
         sys.exit(1)
 
     return resp
