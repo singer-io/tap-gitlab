@@ -4,12 +4,11 @@ import datetime
 import sys
 import os
 import pytz
-
-import backoff
 import requests
 import singer
-
 from singer import Transformer, utils
+
+import backoff
 from strict_rfc3339 import rfc3339_to_timestamp
 
 PER_PAGE = 100
@@ -120,9 +119,10 @@ def gen_request(url):
 
 def transform_row(data, typ, schema):
     result = data
-    if schema.get('format') == 'date-time':
-        dt = datetime.datetime.utcfromtimestamp(rfc3339_to_timestamp(data)).replace(tzinfo=pytz.UTC)
-        result = utils.strftime(dt)
+    if typ == 'string' and schema.get('format') == 'date-time':
+        rfc3339_ts = rfc3339_to_timestamp(data)
+        utc_dt = datetime.datetime.utcfromtimestamp(rfc3339_ts).replace(tzinfo=pytz.UTC)
+        result = utils.strftime(utc_dt)
 
     return result
 
@@ -148,11 +148,7 @@ def sync_commits(project):
     with Transformer(pre_hook=transform_row) as transformer:
         for row in gen_request(url):
             row['project_id'] = project["id"]
-            try:
-                transformed_row = transformer.transform(row, RESOURCES["commits"]["schema"])
-            except:
-                import pdb
-                pdb.set_trace()
+            transformed_row = transformer.transform(row, RESOURCES["commits"]["schema"])
             singer.write_record("commits", transformed_row, time_extracted=utils.now())
 
 
@@ -182,7 +178,7 @@ def sync_milestones(project):
 def sync_users(project):
     url = get_url("users", project['id'])
     project["users"] = []
-    with Transformed(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=transform_row) as transformer:
         for row in gen_request(url):
             transformed_row = transformer.transform(row, RESOURCES["users"]["schema"])
             project["users"].append(row["id"])
