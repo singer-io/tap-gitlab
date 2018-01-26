@@ -3,11 +3,11 @@
 import datetime
 import sys
 import os
-import pytz
 import requests
 import singer
 from singer import Transformer, utils
 
+import pytz
 import backoff
 from strict_rfc3339 import rfc3339_to_timestamp
 
