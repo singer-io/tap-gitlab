@@ -3,14 +3,14 @@
 import datetime
 import sys
 import os
+import pytz
 
 import backoff
 import requests
 import singer
 
-from singer import utils
-from .transform import transform_row
-
+from singer import Transformer, utils
+from strict_rfc3339 import rfc3339_to_timestamp
 
 PER_PAGE = 100
 CONFIG = {
@@ -118,6 +118,13 @@ def gen_request(url):
         for row in resp.json():
             yield row
 
+def transform_row(data, typ, schema):
+    result = data
+    if schema.get('format') == 'date-time':
+        dt = datetime.datetime.utcfromtimestamp(rfc3339_to_timestamp(data)).replace(tzinfo=pytz.UTC)
+        result = utils.strftime(dt)
+
+    return result
 
 def flatten_id(item, target):
     if target in item and item[target] is not None:
@@ -128,78 +135,90 @@ def flatten_id(item, target):
 
 def sync_branches(project):
     url = get_url("branches", project['id'])
-    for row in gen_request(url):
-        row['project_id'] = project['id']
-        flatten_id(row, "commit")
-        row = transform_row(row, RESOURCES["branches"]["schema"])
-        singer.write_record("branches", row)
+    with Transformer(pre_hook=transform_row) as transformer:
+        for row in gen_request(url):
+            row['project_id'] = project['id']
+            flatten_id(row, "commit")
+            transformed_row = transformer.transform(row, RESOURCES["branches"]["schema"])
+            singer.write_record("branches", transformed_row)
 
 
 def sync_commits(project):
     url = get_url("commits", project['id'])
-    for row in gen_request(url):
-        row['project_id'] = project["id"]
-        row = transform_row(row, RESOURCES["commits"]["schema"])
-        singer.write_record("commits", row)
+    with Transformer(pre_hook=transform_row) as transformer:
+        for row in gen_request(url):
+            row['project_id'] = project["id"]
+            try:
+                transformed_row = transformer.transform(row, RESOURCES["commits"]["schema"])
+            except:
+                import pdb
+                pdb.set_trace()
+            singer.write_record("commits", transformed_row)
 
 
 def sync_issues(project):
     url = get_url("issues", project['id'])
-    for row in gen_request(url):
-        flatten_id(row, "author")
-        flatten_id(row, "assignee")
-        flatten_id(row, "milestone")
-        row = transform_row(row, RESOURCES["issues"]["schema"])
-        if row["updated_at"] >= get_start("project_{}".format(project["id"])):
-            singer.write_record("issues", row)
+    with Transformer(pre_hook=transform_row) as transformer:
+        for row in gen_request(url):
+            flatten_id(row, "author")
+            flatten_id(row, "assignee")
+            flatten_id(row, "milestone")
+            transformed_row = transformer.transform(row, RESOURCES["issues"]["schema"])
+
+            if row["updated_at"] >= get_start("project_{}".format(project["id"])):
+                singer.write_record("issues", transformed_row)
 
 
 def sync_milestones(project):
     url = get_url("milestones", project['id'])
-    for row in gen_request(url):
-        row = transform_row(row, RESOURCES["milestones"]["schema"])
-        if row["updated_at"] >= get_start("project_{}".format(project["id"])):
-            singer.write_record("milestones", row)
+    with Transformer(pre_hook=transform_row) as transformer:
+        for row in gen_request(url):
+            transformed_row = transformer.transform(row, RESOURCES["milestones"]["schema"])
+
+            if row["updated_at"] >= get_start("project_{}".format(project["id"])):
+                singer.write_record("milestones", transformed_row)
 
 
 def sync_users(project):
     url = get_url("users", project['id'])
     project["users"] = []
-    for row in gen_request(url):
-        row = transform_row(row, RESOURCES["users"]["schema"])
-        project["users"].append(row["id"])
-        singer.write_record("users", row)
+    with Transformed(pre_hook=transform_row) as transformer:
+        for row in gen_request(url):
+            transformed_row = transformer.transform(row, RESOURCES["users"]["schema"])
+            project["users"].append(row["id"])
+            singer.write_record("users", transformed_row)
 
 
 def sync_project(pid):
     url = get_url("projects", pid)
     data = request(url).json()
 
-    flatten_id(data, "owner")
-    project = transform_row(data, RESOURCES["projects"]["schema"])
+    with Transformer(pre_hook=transform_row) as transformer:
+        flatten_id(data, "owner")
+        project = transformer.transform(data, RESOURCES["projects"]["schema"])
 
-    state_key = "project_{}".format(project["id"])
+        state_key = "project_{}".format(project["id"])
 
-    #pylint: disable=maybe-no-member
-    last_activity_at = project.get('last_activity_at', project.get('created_at'))
-    if not last_activity_at:
-        raise Exception(
-            #pylint: disable=line-too-long
-            "There is no last_activity_at or created_at field on project {}. This usually means I don't have access to the project."
-            .format(project['id']))
+        #pylint: disable=maybe-no-member
+        last_activity_at = project.get('last_activity_at', project.get('created_at'))
+        if not last_activity_at:
+            raise Exception(
+                #pylint: disable=line-too-long
+                "There is no last_activity_at or created_at field on project {}. This usually means I don't have access to the project."
+                .format(project['id']))
 
 
-    if project['last_activity_at'] >= get_start(state_key):
+        if project['last_activity_at'] >= get_start(state_key):
 
-        sync_branches(project)
-        sync_commits(project)
-        sync_issues(project)
-        sync_milestones(project)
-        sync_users(project)
+            sync_branches(project)
+            sync_commits(project)
+            sync_issues(project)
+            sync_milestones(project)
+            sync_users(project)
 
-        singer.write_record("projects", project)
-        utils.update_state(STATE, state_key, last_activity_at)
-        singer.write_state(STATE)
+            singer.write_record("projects", project)
+            utils.update_state(STATE, state_key, last_activity_at)
+            singer.write_state(STATE)
 
 
 def do_sync(pids):
