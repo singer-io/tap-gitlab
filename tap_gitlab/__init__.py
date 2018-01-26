@@ -140,7 +140,7 @@ def sync_branches(project):
             row['project_id'] = project['id']
             flatten_id(row, "commit")
             transformed_row = transformer.transform(row, RESOURCES["branches"]["schema"])
-            singer.write_record("branches", transformed_row)
+            singer.write_record("branches", transformed_row, time_extracted=utils.now())
 
 
 def sync_commits(project):
@@ -153,7 +153,7 @@ def sync_commits(project):
             except:
                 import pdb
                 pdb.set_trace()
-            singer.write_record("commits", transformed_row)
+            singer.write_record("commits", transformed_row, time_extracted=utils.now())
 
 
 def sync_issues(project):
@@ -166,7 +166,7 @@ def sync_issues(project):
             transformed_row = transformer.transform(row, RESOURCES["issues"]["schema"])
 
             if row["updated_at"] >= get_start("project_{}".format(project["id"])):
-                singer.write_record("issues", transformed_row)
+                singer.write_record("issues", transformed_row, time_extracted=utils.now())
 
 
 def sync_milestones(project):
@@ -176,7 +176,7 @@ def sync_milestones(project):
             transformed_row = transformer.transform(row, RESOURCES["milestones"]["schema"])
 
             if row["updated_at"] >= get_start("project_{}".format(project["id"])):
-                singer.write_record("milestones", transformed_row)
+                singer.write_record("milestones", transformed_row, time_extracted=utils.now())
 
 
 def sync_users(project):
@@ -186,12 +186,13 @@ def sync_users(project):
         for row in gen_request(url):
             transformed_row = transformer.transform(row, RESOURCES["users"]["schema"])
             project["users"].append(row["id"])
-            singer.write_record("users", transformed_row)
+            singer.write_record("users", transformed_row, time_extracted=utils.now())
 
 
 def sync_project(pid):
     url = get_url("projects", pid)
     data = request(url).json()
+    time_extracted = utils.now()
 
     with Transformer(pre_hook=transform_row) as transformer:
         flatten_id(data, "owner")
@@ -216,7 +217,7 @@ def sync_project(pid):
             sync_milestones(project)
             sync_users(project)
 
-            singer.write_record("projects", project)
+            singer.write_record("projects", project, time_extracted=time_extracted)
             utils.update_state(STATE, state_key, last_activity_at)
             singer.write_state(STATE)
 
