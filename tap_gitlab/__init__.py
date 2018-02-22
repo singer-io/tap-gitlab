@@ -117,7 +117,7 @@ def gen_request(url):
         for row in resp.json():
             yield row
 
-def transform_row(data, typ, schema):
+def format_timestamp(data, typ, schema):
     result = data
     if typ == 'string' and schema.get('format') == 'date-time':
         rfc3339_ts = rfc3339_to_timestamp(data)
@@ -135,7 +135,7 @@ def flatten_id(item, target):
 
 def sync_branches(project):
     url = get_url("branches", project['id'])
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
             row['project_id'] = project['id']
             flatten_id(row, "commit")
@@ -145,7 +145,7 @@ def sync_branches(project):
 
 def sync_commits(project):
     url = get_url("commits", project['id'])
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
             row['project_id'] = project["id"]
             transformed_row = transformer.transform(row, RESOURCES["commits"]["schema"])
@@ -154,7 +154,7 @@ def sync_commits(project):
 
 def sync_issues(project):
     url = get_url("issues", project['id'])
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
             flatten_id(row, "author")
             flatten_id(row, "assignee")
@@ -167,7 +167,7 @@ def sync_issues(project):
 
 def sync_milestones(project):
     url = get_url("milestones", project['id'])
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
             transformed_row = transformer.transform(row, RESOURCES["milestones"]["schema"])
 
@@ -178,7 +178,7 @@ def sync_milestones(project):
 def sync_users(project):
     url = get_url("users", project['id'])
     project["users"] = []
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
             transformed_row = transformer.transform(row, RESOURCES["users"]["schema"])
             project["users"].append(row["id"])
@@ -190,7 +190,7 @@ def sync_project(pid):
     data = request(url).json()
     time_extracted = utils.now()
 
-    with Transformer(pre_hook=transform_row) as transformer:
+    with Transformer(pre_hook=format_timestamp) as transformer:
         flatten_id(data, "owner")
         project = transformer.transform(data, RESOURCES["projects"]["schema"])
 
