@@ -40,7 +40,7 @@ This tap:
     {"api_url": "https://gitlab.com/api/v3",
      "private_token": "your-access-token",
      "projects": "myorg/repo-a myorg/repo-b",
-     "start_date": "2017-01-17T00:00:00Z"}
+     "start_date": "2018-01-01T00:00:00Z"}
     ```
 
 4. [Optional] Create the initial state file
@@ -68,4 +68,4 @@ This tap:
 
 ---
 
-Copyright &copy; 2017 Stitch
+Copyright &copy; 2018 Stitch
