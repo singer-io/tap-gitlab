@@ -46,14 +46,24 @@ RESOURCES = {
         'schema': load_schema('issues'),
         'key_properties': ['id'],
     },
-    'milestones': {
+    'project_milestones': {
         'url': '/projects/{}/milestones',
+        'schema': load_schema('milestones'),
+        'key_properties': ['id'],
+    },
+    'group_milestones': {
+        'url': '/groups/{}/milestones',
         'schema': load_schema('milestones'),
         'key_properties': ['id'],
     },
     'users': {
         'url': '/projects/{}/users',
         'schema': load_schema('users'),
+        'key_properties': ['id'],
+    },
+    'groups': {
+        'url': '/groups/{}',
+        'schema': load_schema('groups'),
         'key_properties': ['id'],
     },
 }
@@ -63,11 +73,11 @@ LOGGER = singer.get_logger()
 SESSION = requests.Session()
 
 
-def get_url(entity, pid):
-    if not isinstance(pid, int):
-        pid = pid.replace("/", "%2F")
+def get_url(entity, id):
+    if not isinstance(id, int):
+        id = id.replace("/", "%2F")
 
-    return CONFIG['api_url'] + RESOURCES[entity]['url'].format(pid)
+    return CONFIG['api_url'] + RESOURCES[entity]['url'].format(id)
 
 
 def get_start(entity):
@@ -165,15 +175,15 @@ def sync_issues(project):
                 singer.write_record("issues", transformed_row, time_extracted=utils.now())
 
 
-def sync_milestones(project):
-    url = get_url("milestones", project['id'])
+def sync_milestones(entity, element="project"):
+    url = get_url(element + "_milestones", entity['id'])
+
     with Transformer(pre_hook=format_timestamp) as transformer:
         for row in gen_request(url):
-            transformed_row = transformer.transform(row, RESOURCES["milestones"]["schema"])
+            transformed_row = transformer.transform(row, RESOURCES[element + "_milestones"]["schema"])
 
-            if row["updated_at"] >= get_start("project_{}".format(project["id"])):
-                singer.write_record("milestones", transformed_row, time_extracted=utils.now())
-
+            if row["updated_at"] >= get_start(element + "_{}".format(entity["id"])):
+                singer.write_record(element + "_milestones", transformed_row, time_extracted=utils.now())
 
 def sync_users(project):
     url = get_url("users", project['id'])
@@ -183,6 +193,29 @@ def sync_users(project):
             transformed_row = transformer.transform(row, RESOURCES["users"]["schema"])
             project["users"].append(row["id"])
             singer.write_record("users", transformed_row, time_extracted=utils.now())
+
+
+def sync_group(gid, pids):
+    url = CONFIG['api_url'] + RESOURCES["groups"]['url'].format(gid)
+
+    data = request(url).json()
+    time_extracted = utils.now()
+
+    with Transformer(pre_hook=format_timestamp) as transformer:
+        group = transformer.transform(data, RESOURCES["groups"]["schema"])
+
+        if not pids:
+            #  Get all the projects of the group if none are provided
+            for project in group['projects']:
+                if project['id']:
+                    pids.append(project['id'])
+
+        for pid in pids:
+            sync_project(pid)
+
+        sync_milestones(group, "group")
+
+        singer.write_record("groups", group, time_extracted=time_extracted)
 
 
 def sync_project(pid):
@@ -218,27 +251,35 @@ def sync_project(pid):
             singer.write_state(STATE)
 
 
-def do_sync(pids):
+def do_sync():
     LOGGER.info("Starting sync")
+
+    gids = list(filter(None, CONFIG['groups'].split(' ')))
+    pids = list(filter(None, CONFIG['projects'].split(' ')))
 
     for resource, config in RESOURCES.items():
         singer.write_schema(resource, config['schema'], config['key_properties'])
 
-    for pid in pids:
-        sync_project(pid)
+    for gid in gids:
+        sync_group(gid, pids)
+
+    if not gids:
+        # When not syncing groups
+        for pid in pids:
+            sync_project(pid)
 
     LOGGER.info("Sync complete")
 
 
 def main_impl():
-    args = utils.parse_args(["private_token", "projects", "start_date"])
+    args = utils.parse_args(["private_token", "projects", "groups", "start_date"])
 
     CONFIG.update(args.config)
 
     if args.state:
         STATE.update(args.state)
 
-    do_sync(CONFIG['projects'].split(' '))
+    do_sync()
 
 
 def main():
