@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": ["null", "integer"]
         },
         "name": {
             "type": ["null", "string"]
@@ -33,9 +33,6 @@
         },
         "full_path": {
             "type": ["null", "string"]
-        },
-        "id": {
-            "type": ["null", "integer"]
         },
         "projects": {
             "anyOf": [

@@ -204,18 +204,18 @@ def sync_group(gid, pids):
     with Transformer(pre_hook=format_timestamp) as transformer:
         group = transformer.transform(data, RESOURCES["groups"]["schema"])
 
-        if not pids:
-            #  Get all the projects of the group if none are provided
-            for project in group['projects']:
-                if project['id']:
-                    pids.append(project['id'])
+    if not pids:
+        #  Get all the projects of the group if none are provided
+        for project in group['projects']:
+            if project['id']:
+                pids.append(project['id'])
 
-        for pid in pids:
-            sync_project(pid)
+    for pid in pids:
+        sync_project(pid)
 
-        sync_milestones(group, "group")
+    sync_milestones(group, "group")
 
-        singer.write_record("groups", group, time_extracted=time_extracted)
+    singer.write_record("groups", group, time_extracted=time_extracted)
 
 
 def sync_project(pid):
@@ -227,28 +227,28 @@ def sync_project(pid):
         flatten_id(data, "owner")
         project = transformer.transform(data, RESOURCES["projects"]["schema"])
 
-        state_key = "project_{}".format(project["id"])
+    state_key = "project_{}".format(project["id"])
 
-        #pylint: disable=maybe-no-member
-        last_activity_at = project.get('last_activity_at', project.get('created_at'))
-        if not last_activity_at:
-            raise Exception(
-                #pylint: disable=line-too-long
-                "There is no last_activity_at or created_at field on project {}. This usually means I don't have access to the project."
-                .format(project['id']))
+    #pylint: disable=maybe-no-member
+    last_activity_at = project.get('last_activity_at', project.get('created_at'))
+    if not last_activity_at:
+        raise Exception(
+            #pylint: disable=line-too-long
+            "There is no last_activity_at or created_at field on project {}. This usually means I don't have access to the project."
+            .format(project['id']))
 
 
-        if project['last_activity_at'] >= get_start(state_key):
+    if project['last_activity_at'] >= get_start(state_key):
 
-            sync_branches(project)
-            sync_commits(project)
-            sync_issues(project)
-            sync_milestones(project)
-            sync_users(project)
+        sync_branches(project)
+        sync_commits(project)
+        sync_issues(project)
+        sync_milestones(project)
+        sync_users(project)
 
-            singer.write_record("projects", project, time_extracted=time_extracted)
-            utils.update_state(STATE, state_key, last_activity_at)
-            singer.write_state(STATE)
+        singer.write_record("projects", project, time_extracted=time_extracted)
+        utils.update_state(STATE, state_key, last_activity_at)
+        singer.write_state(STATE)
 
 
 def do_sync():
