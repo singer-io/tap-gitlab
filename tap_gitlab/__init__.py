@@ -16,6 +16,7 @@ CONFIG = {
     'api_url': "https://gitlab.com/api/v3",
     'private_token': None,
     'start_date': None,
+    'groups': ''
 }
 STATE = {}
 
@@ -272,7 +273,8 @@ def do_sync():
 
 
 def main_impl():
-    args = utils.parse_args(["private_token", "projects", "groups", "start_date"])
+    # TODO: Address properties that are required or not
+    args = utils.parse_args(["private_token", "projects", "start_date"])
 
     CONFIG.update(args.config)
 
