@@ -91,7 +91,7 @@ def get_start(entity):
 @backoff.on_exception(backoff.expo,
                       (requests.exceptions.RequestException),
                       max_tries=5,
-                      giveup=lambda e: e.response is not None and 400 <= e.response.status_code < 500, # pylint: disable=line-too-long
+                      giveup=lambda e: e.response is not None and e.response.status_code != 404 and 400 <= e.response.status_code < 500, # pylint: disable=line-too-long
                       factor=2)
 def request(url, params=None):
     params = params or {}
@@ -105,10 +105,14 @@ def request(url, params=None):
     LOGGER.info("GET {}".format(req.url))
     resp = SESSION.send(req)
 
-    if resp.status_code >= 400:
-        LOGGER.critical(
-            "Error making request to GitLab API: GET {} [{} - {}]".format(
-                req.url, resp.status_code, resp.content))
+    if resp.status_code == 404 and b'404 Repository Not Found' in resp.content:
+        # Don't exit program if repository disabled (404)
+        LOGGER.warning("Disabled repository: GET {} [{} - {}]".format(
+                        req.url, resp.status_code, resp.content))
+        return -1
+    elif resp.status_code >= 400:
+        LOGGER.critical("Error making request to GitLab API: GET {} [{} - {}]".format(
+                        req.url, resp.status_code, resp.content))
         sys.exit(1)
 
     return resp
@@ -117,16 +121,18 @@ def request(url, params=None):
 def gen_request(url):
     params = {'page': 1}
     resp = request(url, params)
-    last_page = int(resp.headers.get('X-Total-Pages', 1))
+    
+    if resp != -1:
+        last_page = int(resp.headers.get('X-Total-Pages', 1))
 
-    for row in resp.json():
-        yield row
-
-    for page in range(2, last_page + 1):
-        params['page'] = page
-        resp = request(url, params)
         for row in resp.json():
             yield row
+
+        for page in range(2, last_page + 1):
+            params['page'] = page
+            resp = request(url, params)
+            for row in resp.json():
+                yield row
 
 def format_timestamp(data, typ, schema):
     result = data
