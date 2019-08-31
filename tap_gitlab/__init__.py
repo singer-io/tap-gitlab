@@ -245,9 +245,9 @@ def sync_project(pid):
         sync_commits(project)
         sync_issues(project)
         sync_milestones(project)
-        sync_users(project)
-
+        
         singer.write_record("projects", project, time_extracted=time_extracted)
+        sync_users(project)
         utils.update_state(STATE, state_key, last_activity_at)
         singer.write_state(STATE)
 
