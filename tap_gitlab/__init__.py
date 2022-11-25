@@ -16,6 +16,7 @@ CONFIG = {
     'api_url': "https://gitlab.com/api/v3",
     'private_token': None,
     'start_date': None,
+    'recurse_groups': False,
     'groups': ''
 }
 STATE = {}
@@ -55,6 +56,11 @@ RESOURCES = {
     'group_milestones': {
         'url': '/groups/{}/milestones',
         'schema': load_schema('milestones'),
+        'key_properties': ['id'],
+    },
+    'group_subgroups': {
+        'url': '/groups/{}/subgroups',
+        'schema': load_schema('groups'),
         'key_properties': ['id'],
     },
     'users': {
@@ -210,6 +216,14 @@ def sync_group(gid, pids):
         for project in group['projects']:
             if project['id']:
                 pids.append(project['id'])
+
+        if CONFIG['recurse_groups'] is True:
+            group_subgroups_url = get_url("group_subgroups", id=gid)
+            print(group_subgroups_url)
+
+            for group in gen_request(group_subgroups_url):
+                if group["name"]:
+                    sync_group(str(group["full_path"].replace("/", "%2F")), [])
 
     for pid in pids:
         sync_project(pid)

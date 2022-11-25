@@ -38,17 +38,20 @@ This tap:
     - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v3`
     - Groups to track (space separated)    
     - Projects to track (space separated)
+    - Recurse through subgroups (boolean). If true, all subgroups will be tracked of the groups specified in the Groups setting will be tracked
     
     Notes:
     - either groups or projects need to be provided
     - filling in 'groups' but leaving 'projects' empty will sync all group projects.
+    - filling in 'groups' and setting 'recurse' to true will sync all group projects and all subgroups projects.
     - filling in 'projects' but leaving 'groups' empty will sync selected projects.
     - filling in 'groups' and 'groups' will sync selected projects of those groups.
 
     ```json
     {"api_url": "https://gitlab.com/api/v3",
      "private_token": "your-access-token",
-    "groups": "myorg mygroup", 
+    "groups": "myorg mygroup",
+    "recurse_groups": false,
     "projects": "myorg/repo-a myorg/repo-b",
      "start_date": "2018-01-01T00:00:00Z"}
     ```
