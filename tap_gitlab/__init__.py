@@ -67,6 +67,11 @@ RESOURCES = {
         'schema': load_schema('groups'),
         'key_properties': ['id'],
     },
+    'merge_requests': {
+        'url': '/projects/{}/merge_requests',
+        'schema': load_schema('merge_requests'),
+        'key_properties': ['id'],
+    },
 }
 
 
@@ -130,7 +135,7 @@ def gen_request(url):
 
 def format_timestamp(data, typ, schema):
     result = data
-    if typ == 'string' and schema.get('format') == 'date-time':
+    if typ == 'string' and schema.get('format') == 'date-time' and data is not None:
         rfc3339_ts = rfc3339_to_timestamp(data)
         utc_dt = datetime.datetime.utcfromtimestamp(rfc3339_ts).replace(tzinfo=pytz.UTC)
         result = utils.strftime(utc_dt)
@@ -219,6 +224,25 @@ def sync_group(gid, pids):
     singer.write_record("groups", group, time_extracted=time_extracted)
 
 
+def sync_merge_request(project):
+    url = get_url('merge_requests', project['id'])
+    with Transformer(pre_hook=format_timestamp) as transformer:
+        for row in gen_request(url):
+            flatten_id(row, 'merged_by')
+            flatten_id(row, 'closed_by')
+            flatten_id(row, 'merge_user')
+            flatten_id(row, 'assignee')
+            flatten_id(row, 'author')
+            transformed_row = transformer.transform(
+                row, RESOURCES['merge_requests']['schema']
+            )
+
+            if row['updated_at'] >= get_start('project_{}'.format(project['id'])):
+                singer.write_record(
+                    'merge_requests', transformed_row, time_extracted=utils.now()
+                )
+
+
 def sync_project(pid):
     url = get_url("projects", pid)
     data = request(url).json()
@@ -246,6 +270,7 @@ def sync_project(pid):
         sync_issues(project)
         sync_milestones(project)
         sync_users(project)
+        sync_merge_request(project)
 
         singer.write_record("projects", project, time_extracted=time_extracted)
         utils.update_state(STATE, state_key, last_activity_at)
