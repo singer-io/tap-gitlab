@@ -1,0 +1,148 @@
+{
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "iid": {
+            "type": "integer"
+        },
+        "project_id": {
+            "type": "integer"
+        },
+        "title": {
+            "type": "string"
+        },
+        "name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "description": {
+            "type": "string"
+        },
+        "state": {
+            "type": "string"
+        },
+        "created_at": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "updated_at": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "merged_by_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "merge_user_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "merged_at": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "closed_by_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "closed_at": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "author_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "assignee_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "target_branch": {
+            "type": "string"
+        },
+        "source_branch": {
+            "type": "string"
+        },
+        "user_notes_count": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "upvotes": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "downvotes": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "merge_status": {
+            "type": "string"
+        },
+        "has_conflicts": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "squash": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "merge_when_pipeline_succeeds": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        }
+    }
+}
