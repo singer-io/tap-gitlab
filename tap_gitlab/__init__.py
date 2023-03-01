@@ -115,18 +115,19 @@ def request(url, params=None):
 
 
 def gen_request(url):
-    params = {'page': 1}
-    resp = request(url, params)
-    last_page = int(resp.headers.get('X-Total-Pages', 1))
-
-    for row in resp.json():
-        yield row
-
-    for page in range(2, last_page + 1):
-        params['page'] = page
+    flag = False
+    page = 1
+    while flag == False:         
+        params = {'page': page}
         resp = request(url, params)
         for row in resp.json():
             yield row
+        if (page + 1 == int('0' + resp.headers.get('x-next-page'))):
+            flag = False
+        else:
+            flag = True
+        page += 1
+
 
 def format_timestamp(data, typ, schema):
     result = data
