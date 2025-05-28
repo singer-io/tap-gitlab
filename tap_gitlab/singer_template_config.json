@@ -1,0 +1,77 @@
+{
+  "name": "tap-gitlab",
+  "version": "0.5.2",
+  "api_version": "v4",
+  "base_url": "https://gitlab.com/api/v4",
+  "auth_method": "private_token",
+  "auth_token_key": "private_token",
+  "default_headers": {
+    "User-Agent": "tap-gitlab",
+    "Accept": "application/json"
+  },
+  "streams": [
+    {
+      "name": "projects",
+      "path": "/projects",
+      "key_properties": ["id"],
+      "schema_file": "schemas/projects.json",
+      "primary": true,
+      "replication_method": "full_table"
+    },
+    {
+      "name": "branches",
+      "path": "/projects/{project_id}/repository/branches",
+      "parent": "projects",
+      "key_properties": ["project_id", "name"],
+      "schema_file": "schemas/branches.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "commits",
+      "path": "/projects/{project_id}/repository/commits",
+      "parent": "projects",
+      "key_properties": ["id"],
+      "schema_file": "schemas/commits.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "issues",
+      "path": "/projects/{project_id}/issues",
+      "parent": "projects",
+      "key_properties": ["id"],
+      "schema_file": "schemas/issues.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "project_milestones",
+      "path": "/projects/{project_id}/milestones",
+      "parent": "projects",
+      "key_properties": ["id"],
+      "schema_file": "schemas/milestones.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "group_milestones",
+      "path": "/groups/{group_id}/milestones",
+      "parent": "groups",
+      "key_properties": ["id"],
+      "schema_file": "schemas/milestones.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "users",
+      "path": "/projects/{project_id}/users",
+      "parent": "projects",
+      "key_properties": ["id"],
+      "schema_file": "schemas/users.json",
+      "replication_method": "full_table"
+    },
+    {
+      "name": "groups",
+      "path": "/groups/{group_id}",
+      "key_properties": ["id"],
+      "schema_file": "schemas/groups.json",
+      "replication_method": "full_table"
+    }
+  ]
+}
