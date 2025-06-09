@@ -1,6 +1,7 @@
 {
     "type": "object",
     "properties": {
+      "_comment": {
         "approvals_before_merge": {
             "type": ["null", "integer"]
         },
