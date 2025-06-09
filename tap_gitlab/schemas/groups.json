@@ -1,7 +1,6 @@
 {
     "type": "object",
     "properties": {
-      "_comment": {
         "id": {
             "type": ["null", "integer"]
         },
