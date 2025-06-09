@@ -1,13 +1,14 @@
 import sys
 import json
 import singer
-from tap_sample.client import Client
-from tap_sample.discover import discover
-from tap_sample.sync import sync
+from tap_gitlab.client import Client
+from tap_gitlab.discover import discover
+from tap_gitlab.sync import sync
 
 LOGGER = singer.get_logger()
 
 REQUIRED_CONFIG_KEYS = []
+
 
 def do_discover():
     """
@@ -37,7 +38,8 @@ def main():
                 client=client,
                 config=parsed_args.config,
                 catalog=parsed_args.catalog,
-                state=state)
+                state=state,
+            )
 
 
 if __name__ == "__main__":

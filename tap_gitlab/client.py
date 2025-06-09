@@ -6,7 +6,7 @@ from requests import session
 from requests.exceptions import Timeout, ConnectionError, ChunkedEncodingError
 from singer import get_logger, metrics
 
-from tap_sample.exceptions import ERROR_CODE_EXCEPTION_MAPPING, Error, BackoffError
+from tap_gitlab.exceptions import ERROR_CODE_EXCEPTION_MAPPING, Error, BackoffError
 
 LOGGER = get_logger()
 REQUEST_TIMEOUT = 300
@@ -99,12 +99,13 @@ class Client:
             raise_for_error(response)
 
         return response.json()
-        def paginate(self, path: str, params: Optional[Dict] = None, context: Optional[Dict] = None) -> list:
 
-            results = []
-            params = params or {}
-            headers = {}
-            next_page = 1
+    def paginate(self, path: str, params: Optional[Dict] = None, context: Optional[Dict] = None) -> list:
+        """Handles paginated GET requests."""
+        results = []
+        params = params or {}
+        headers = {}
+        next_page = 1
 
         while True:
             params["page"] = next_page

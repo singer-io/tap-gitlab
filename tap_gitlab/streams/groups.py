@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from singer import get_bookmark, get_logger
-from tap_sample.streams.abstracts import IncrementalStream
-from tap_sample.streams.group_milestones import GroupMilestones  # import child stream
+from tap_gitlab.streams.abstracts import IncrementalStream
+from tap_gitlab.streams.group_milestones import GroupMilestones  # import child stream
 
 LOGGER = get_logger()
 

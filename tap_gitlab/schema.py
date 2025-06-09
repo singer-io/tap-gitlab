@@ -3,7 +3,7 @@ import json
 import singer
 from typing import Dict, Tuple
 from singer import metadata
-from tap_sample.streams import STREAMS
+from tap_gitlab.streams import STREAMS
 
 LOGGER = singer.get_logger()
 

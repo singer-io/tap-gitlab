@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from urllib.parse import quote
 from singer import get_bookmark, get_logger
-from tap_sample.streams.abstracts import IncrementalStream
+from tap_gitlab.streams.abstracts import IncrementalStream
 
 LOGGER = get_logger()
 

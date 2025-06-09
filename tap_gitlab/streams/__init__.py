@@ -1,11 +1,11 @@
-from tap_sample.streams.projects import Projects
-from tap_sample.streams.branches import Branches
-from tap_sample.streams.commits import Commits
-from tap_sample.streams.issues import Issues
-from tap_sample.streams.project_milestones import ProjectMilestones
-from tap_sample.streams.group_milestones import GroupMilestones
-from tap_sample.streams.users import Users
-from tap_sample.streams.groups import Groups
+from tap_gitlab.streams.projects import Projects
+from tap_gitlab.streams.branches import Branches
+from tap_gitlab.streams.commits import Commits
+from tap_gitlab.streams.issues import Issues
+from tap_gitlab.streams.project_milestones import ProjectMilestones
+from tap_gitlab.streams.group_milestones import GroupMilestones
+from tap_gitlab.streams.users import Users
+from tap_gitlab.streams.groups import Groups
 
 STREAMS = {
     "projects": Projects,

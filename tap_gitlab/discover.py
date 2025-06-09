@@ -1,7 +1,7 @@
 import singer
 from singer import metadata
 from singer.catalog import Catalog, CatalogEntry, Schema
-from tap_sample.schema import get_schemas
+from tap_gitlab.schema import get_schemas
 
 LOGGER = singer.get_logger()
 

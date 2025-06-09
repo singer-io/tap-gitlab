@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from urllib.parse import quote
 from singer import get_logger
-from tap_sample.streams.abstracts import IncrementalStream
+from tap_gitlab.streams.abstracts import IncrementalStream
 
 LOGGER = get_logger()
 
@@ -23,7 +23,6 @@ class Issues(IncrementalStream):
         if not parent_obj:
             LOGGER.warning("Issues stream called independently without parent_obj. Skipping.")
             return None  # prevents crashing
-            #raise ValueError("Parent object is required for Issues stream.")
         project_identifier = parent_obj.get("path_with_namespace") or parent_obj.get("id")
         if not project_identifier:
             LOGGER.error("Missing project identifier in parent_obj.")

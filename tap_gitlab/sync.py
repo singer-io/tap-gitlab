@@ -1,7 +1,7 @@
 import singer
 from typing import Dict
-from tap_sample.streams import STREAMS
-from tap_sample.client import Client
+from tap_gitlab.streams import STREAMS
+from tap_gitlab.client import Client
 
 LOGGER = singer.get_logger()
 
