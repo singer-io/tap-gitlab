@@ -1,6 +1,7 @@
 {
     "type": "object",
     "properties": {
+      "_comment": {
         "id": {
             "type": "string"
         },
