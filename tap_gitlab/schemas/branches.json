@@ -1,8 +1,6 @@
 {
   "type": "object",
   "properties": {
-      "type": "string"
-    },
     "project_id": {
       "type": "integer"
     },

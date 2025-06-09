@@ -1,75 +1,30 @@
 {
   "type": "object",
   "properties": {
-    "project_id": {
-      "type": "integer"
-    },
-    "milestone_id": {
-      "type": ["null", "integer"]
-    },
-    "author_id": {
-      "type": ["null", "integer"]
-    },
-    "assignee_id": {
-      "type": ["null", "integer"]
-    },
-    "description": {
-      "type": ["null", "string"]
-    },
-    "state": {
-      "type": ["null", "string"]
-    },
-    "id": {
-      "type": "integer"
-    },
-    "iid": {
-      "type": "integer"
-    },
-    "labels": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "title": {
-      "type": ["null", "string"]
+    "id": { "type": ["null", "integer"] },
+    "iid": { "type": ["null", "integer"] },
+    "project_id": { "type": ["null", "integer"] },
+    "title": { "type": ["null", "string"] },
+    "description": { "type": ["null", "string"] },
+    "state": { "type": ["null", "string"] },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
     },
     "updated_at": {
-      "anyOf": [
-        {
-          "type": "string",
-          "format": "date-time"
-        },
-        {
-          "type": "null"
-        }
-      ]
+      "type": "string",
+      "format": "date-time"
     },
-    "created_at": {
-      "anyOf": [
-        {
-          "type": "string",
-          "format": "date-time"
-        },
-        {
-          "type": "null"
-        }
-      ]
+    "closed_at": {
+      "type": ["null", "string"],
+      "format": "date-time"
     },
-    "subscribed": {
-      "type": ["null", "boolean"]
+    "author_id": { "type": ["null", "integer"] },
+    "assignee_ids": {
+      "type": ["null", "array"],
+      "items": { "type": "integer" }
     },
-    "user_notes_count": {
-      "type": ["null", "integer"]
-    },
-    "due_date": {
-      "type": ["null", "string"]
-    },
-    "web_url": {
-      "type": ["null", "string"]
-    },
-    "confidential": {
-      "type": ["null", "boolean"]
-    }
+    "type": { "type": ["null", "string"] },
+    "web_url": { "type": ["null", "string"] }
   }
 }
