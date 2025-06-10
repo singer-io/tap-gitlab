@@ -110,14 +110,16 @@ class IncrementalStream(BaseStream):
         if not (key or self.replication_keys):
             return state
 
-        current_bookmark = get_bookmark(state, stream, key or self.replication_keys[0], self.client.config["start_date"])
+        bookmark_key = key or self.replication_keys[0]
+        current_bookmark = get_bookmark(state, stream, bookmark_key, self.client.config["start_date"])
         try:
             value = max(current_bookmark, value)
         except Exception:
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
 
-        return write_bookmark(state, stream, key or self.replication_keys[0], value)
+        updated_state = write_bookmark(state, stream, bookmark_key, value)
+        return updated_state
 
     def _to_utc_datetime(self, value):
         if value is None:
