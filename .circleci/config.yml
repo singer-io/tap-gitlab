@@ -10,8 +10,8 @@ jobs:
       - run:
           name: "Setup virtual env"
           command: |
-            python3 -m venv venv
-            source venv/bin/activate
+            python3 -m venv tap-gitlab-venv
+            source tap-gitlab-venv/bin/activate
             pip install -U "pip==22.2.2" "setuptools==65.3.0"
             pip install .[dev]
 
@@ -23,13 +23,13 @@ jobs:
       - run:
           name: "JSON Validator"
           command: |
-            source venv/bin/activate
+            source tap-gitlab-venv/bin/activate
             stitch-validate-json tap_gitlab/schemas/*.json
 
       - run:
           name: "pylint"
           command: |
-            source venv/bin/activate
+            source tap-gitlab-venv/bin/activate
             pip install pylint
             pylint tap_gitlab -d C,R,W
 
@@ -38,8 +38,8 @@ jobs:
       - run:
           name: "Unit Tests"
           command: |
-            source venv/bin/activate
-            pip install nose coverage
+            source tap-gitlab-venv/bin/activate
+            pip install nose coverage pytz
             nosetests --with-coverage --cover-erase --cover-package=tap_gitlab --cover-html-dir=htmlcov tests/unittests
             coverage html
 
@@ -54,8 +54,8 @@ jobs:
           command: |
             aws s3 cp s3://com-stitchdata-dev-deployment-assets/environments/tap-tester/tap_tester_sandbox dev_env.sh
             source dev_env.sh
-            source venv/bin/activate
-            run-test --tap=tap- tests
+            source tap-gitlab-venv/bin/activate
+            run-test --tap=tap-gitlab tests
 
 workflows:
   version: 2
