@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Tuple, List
-import singer
 from singer import (
     Transformer,
     get_bookmark,
@@ -120,8 +119,14 @@ class IncrementalStream(BaseStream):
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
 
-        updated_state = singer.write_bookmark(state, stream, bookmark_key, value)
-        return updated_state
+        #Safe manual update to avoid E1121 error from write_bookmark
+        if "bookmarks" not in state:
+            state["bookmarks"] = {}
+        if stream not in state["bookmarks"]:
+            state["bookmarks"][stream] = {}
+        state["bookmarks"][stream][bookmark_key] = value
+
+        return state
 
     def _to_utc_datetime(self, value):
         if value is None:
