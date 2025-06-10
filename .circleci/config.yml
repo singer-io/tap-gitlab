@@ -52,18 +52,21 @@ jobs:
       - run:
           name: "Integration Tests"
           command: |
-            # Download sandbox and source it
+            # Step 1: Download the sandbox env
             aws s3 cp s3://com-stitchdata-dev-deployment-assets/environments/tap-tester/tap_tester_sandbox dev_env.sh
             source dev_env.sh
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
 
-            # Try full path to run-test (assuming it's inside the sandbox)
-            if [ -f "./run-test" ]; then
-              chmod +x ./run-test
-              ./run-test --tap=tap-gitlab tests
-            else
-              echo "ERROR: run-test not found in current directory"
+            # Step 2: Try to locate run-test binary
+            RUN_TEST_PATH=$(find . -name run-test -type f | head -n 1)
+
+            if [ -z "$RUN_TEST_PATH" ]; then
+              echo "ERROR: run-test not found anywhere after sourcing sandbox"
               exit 1
+            else
+              chmod +x "$RUN_TEST_PATH"
+              echo "Found run-test at $RUN_TEST_PATH"
+              "$RUN_TEST_PATH" --tap=tap-gitlab tests
             fi
 
 workflows:
