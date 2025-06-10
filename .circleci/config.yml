@@ -50,16 +50,14 @@ jobs:
           path: htmlcov
 
       - run:
-          name: "Install tap-tester"
+          name: "Integration Tests"
           command: |
+            aws s3 cp s3://com-stitchdata-dev-deployment-assets/environments/tap-tester/tap_tester_sandbox dev_env.sh
+            source dev_env.sh
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pip install git+https://github.com/AutoIDM/tap-tester.git
-
-      - run:
-          name: "Run Integration Tests (direct call)"
-          command: |
-            source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            tap-tester --path "tests"
+            # FIX: Install missing dependency
+            pip install tap-tester
+            run-test --tap=tap-gitlab tests
 
 workflows:
   version: 2
