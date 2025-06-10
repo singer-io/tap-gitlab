@@ -111,14 +111,16 @@ class IncrementalStream(BaseStream):
             return state
 
         bookmark_key = key or self.replication_keys[0]
-        current_bookmark = get_bookmark(state, stream, bookmark_key, self.client.config["start_date"])
+        current_bookmark = get_bookmark(
+            state, stream, bookmark_key, self.client.config["start_date"]
+        )
         try:
             value = max(current_bookmark, value)
         except Exception:
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
 
-        updated_state = singer.write_bookmark(state, stream, bookmark_key, value)  # ✅ fixed: call original singer method
+        updated_state = singer.write_bookmark(state, stream, bookmark_key, value)
         return updated_state
 
     def _to_utc_datetime(self, value):
@@ -186,9 +188,9 @@ class IncrementalStream(BaseStream):
                         child.sync(state=state, transformer=transformer, parent_obj=record)
 
             state = self.write_bookmark(
-                state,
-                self.tap_stream_id,
+                state=state,
+                stream=self.tap_stream_id,
                 key=None,
                 value=current_max_bookmark_date.isoformat()
-            )  # ✅ fixed: all keyword args passed
+            )
             return counter.value
