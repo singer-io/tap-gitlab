@@ -13,7 +13,7 @@ jobs:
             python3 -m venv venv
             source venv/bin/activate
             pip install -U "pip==22.2.2" "setuptools==65.3.0"
-            pip install .[dev] singer-python==5.12.1
+            pip install .[dev]
 
       - run:
           name: "Clean .pyc files"
