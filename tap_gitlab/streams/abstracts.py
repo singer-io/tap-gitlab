@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 
 LOGGER = get_logger()
 
-
 class BaseStream(ABC):
     url_endpoint = ""
     path = ""
@@ -105,7 +104,7 @@ class IncrementalStream(BaseStream):
             self.client.config["start_date"],
         )
 
-    def write_bookmark(self, state: dict, stream: str, key: Any = None, value: Any = None) -> Dict:
+    def update_bookmark_state(self, state: dict, stream: str, key: Any = None, value: Any = None) -> Dict:
         if not (key or self.replication_keys):
             return state
 
@@ -119,7 +118,6 @@ class IncrementalStream(BaseStream):
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
 
-        #Safe manual update to avoid E1121 error from write_bookmark
         if "bookmarks" not in state:
             state["bookmarks"] = {}
         if stream not in state["bookmarks"]:
@@ -149,7 +147,6 @@ class IncrementalStream(BaseStream):
         return record
 
     def sync(self, state: Dict, transformer: Transformer, parent_obj: Dict = None) -> Dict:
-        # Skip if this is a child stream called without parent object
         if self.parent and parent_obj is None:
             LOGGER.warning(f"Skipping top-level sync for child stream '{self.tap_stream_id}'")
             return {}
@@ -192,7 +189,7 @@ class IncrementalStream(BaseStream):
                         LOGGER.info(f"Triggering sync for child stream: {child.tap_stream_id}")
                         child.sync(state=state, transformer=transformer, parent_obj=record)
 
-            state = self.write_bookmark(
+            state = self.update_bookmark_state(
                 state=state,
                 stream=self.tap_stream_id,
                 key=None,
