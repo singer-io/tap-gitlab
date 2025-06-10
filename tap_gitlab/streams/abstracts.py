@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Tuple, List
+import singer
 from singer import (
     Transformer,
     get_bookmark,
     get_logger,
     metrics,
-    write_bookmark,
     write_record,
     write_schema,
     metadata
@@ -118,7 +118,7 @@ class IncrementalStream(BaseStream):
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
 
-        updated_state = write_bookmark(state, stream, bookmark_key, value)
+        updated_state = singer.write_bookmark(state, stream, bookmark_key, value)  # ✅ fixed: call original singer method
         return updated_state
 
     def _to_utc_datetime(self, value):
@@ -185,5 +185,10 @@ class IncrementalStream(BaseStream):
                         LOGGER.info(f"Triggering sync for child stream: {child.tap_stream_id}")
                         child.sync(state=state, transformer=transformer, parent_obj=record)
 
-            state = self.write_bookmark(state, self.tap_stream_id, value=current_max_bookmark_date.isoformat())
+            state = self.write_bookmark(
+                state,
+                self.tap_stream_id,
+                key=None,
+                value=current_max_bookmark_date.isoformat()
+            )  # ✅ fixed: all keyword args passed
             return counter.value
