@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 
 LOGGER = get_logger()
 
+
 class BaseStream(ABC):
     url_endpoint = ""
     path = ""
@@ -97,7 +98,7 @@ class BaseStream(ABC):
 
 class IncrementalStream(BaseStream):
     def get_bookmark(self, state: dict, stream: str, key: Any = None) -> int:
-        return get_bookmark(
+        return get_bookmark(  # pylint: disable=E1121
             state,
             stream,
             key or self.replication_keys[0],
@@ -109,7 +110,7 @@ class IncrementalStream(BaseStream):
             return state
 
         bookmark_key = key or self.replication_keys[0]
-        current_bookmark = get_bookmark(
+        current_bookmark = get_bookmark(  # pylint: disable=E1121
             state, stream, bookmark_key, self.client.config["start_date"]
         )
         try:
@@ -189,7 +190,7 @@ class IncrementalStream(BaseStream):
                         LOGGER.info(f"Triggering sync for child stream: {child.tap_stream_id}")
                         child.sync(state=state, transformer=transformer, parent_obj=record)
 
-            state = self.update_bookmark_state(
+            state = self.update_bookmark_state(  # pylint: disable=E1121
                 state=state,
                 stream=self.tap_stream_id,
                 key=None,
