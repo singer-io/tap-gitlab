@@ -10,7 +10,7 @@ class Branches(IncrementalStream):
     key_properties = ["project_id", "name"]
     replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = ["commit_id"]
+    replication_keys = ["committed_date"]
     data_key = None
     bookmark_value = None
 
