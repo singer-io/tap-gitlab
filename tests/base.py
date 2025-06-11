@@ -22,12 +22,12 @@ class BaseTest(BaseCase):
     @staticmethod
     def tap_name():
         """The name of the tap."""
-        return "tap-"
+        return "tap-gitlab"
     
     @staticmethod
     def get_type():
         """The name of the tap."""
-        return "platform."
+        return "platform.gitlab"
 
     @classmethod
     def expected_metadata(cls):
