@@ -13,8 +13,7 @@ setup(
         'singer-python==6.1.1',
         'requests==2.32.3',
         'strict-rfc3339==0.7',
-        'backoff==2.2.1',
-        'pytz'
+        'backoff==2.2.1'
     ],
     entry_points='''
         [console_scripts]
