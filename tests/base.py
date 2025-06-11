@@ -95,8 +95,16 @@ class BaseTest(BaseCase):
     def get_credentials():
         """Authentication information for the test account."""
         credentials_dict = {}
-        creds = 
+        creds = {
+            "api_url": "TAP_GITLAB_API_URL",
+            "private_token": "TAP_GITLAB_PRIVATE_TOKEN",
+            "auth_header_key": "TAB_GITLAB_AUTH_HEADER_KEY",
+            "auth_token_key": "TAP_GITLAB_AUTH_TOKEN_KEY",
+            "groups": "TAP_GITLAB_GROUPS",
+            "projects": "TAP_GITLAB_PROJECTS",
+            "start_date": "TAP_GITLAB_START_DATE"
 
+        }
         for cred in creds:
             credentials_dict[cred] = os.getenv(creds[cred])
 
