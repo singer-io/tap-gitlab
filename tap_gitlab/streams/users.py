@@ -10,7 +10,7 @@ class Users(IncrementalStream):
     key_properties = ["id"]
     replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = ["id"]
+    replication_keys = None
     data_key = None
     bookmark_value = None
 

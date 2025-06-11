@@ -10,7 +10,7 @@ class ProjectMilestones(IncrementalStream):
     key_properties = ["id"]
     replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = ["created_at"]
+    replication_keys = ["updated_at"]
     data_key = None
     bookmark_value = None
 

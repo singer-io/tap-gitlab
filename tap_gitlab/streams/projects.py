@@ -8,6 +8,6 @@ class Projects(IncrementalStream):
     tap_stream_id = "projects"
     key_properties = ["id"]
     replication_method = "INCREMENTAL"
-    replication_keys = ["last_activity_at"]  # Use this instead of "updated_at"
+    replication_keys = ["updated_at"]  # Use this instead of last_activity_at"
     path = "/projects"
     data_key = None
