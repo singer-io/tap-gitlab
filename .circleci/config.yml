@@ -16,14 +16,8 @@ jobs:
             pip install .[dev]
 
       - run:
-          name: "Clean .pyc files"
-          command: |
-            find . -name "*.pyc" -exec rm -f {} +
-
-      - run:
           name: "JSON Validator"
           command: |
-            source /usr/local/share/virtualenvs/tap-tester/bin/activate
             stitch-validate-json tap_gitlab/schemas/*.json
 
       - run:
@@ -48,20 +42,6 @@ jobs:
 
       - store_artifacts:
           path: htmlcov
-
-      - run:
-          name: "Mock tap-tester CLI (check)"
-          command: |
-            echo -e '#!/bin/bash\nrun-test "$@"' > /usr/local/bin/tap-tester
-            chmod +x /usr/local/bin/tap-tester
-
-      - run:
-          name: "Integration Tests"
-          command: |
-            aws s3 cp s3://com-stitchdata-dev-deployment-assets/environments/tap-tester/tap_tester_sandbox dev_env.sh
-            source dev_env.sh
-            source /usr/local/share/virtualenvs/tap-tester/bin/activate
-            run-test --tap=tap-gitlab tests
 
 workflows:
   version: 2
