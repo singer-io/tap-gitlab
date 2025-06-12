@@ -1,26 +1,88 @@
 {
-    "type": "object",
-    "properties": {
-        "project_id": {
-            "type": "integer"
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "merged": {
+      "type": "boolean"
+    },
+    "protected": {
+      "type": "boolean"
+    },
+    "default": {
+      "type": "boolean"
+    },
+    "developers_can_push": {
+      "type": "boolean"
+    },
+    "developers_can_merge": {
+      "type": "boolean"
+    },
+    "can_push": {
+      "type": "boolean"
+    },
+    "web_url": {
+      "type": "string"
+    },
+    "commit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
         },
-        "name": {
+        "short_id": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
             "type": "string"
+          }
         },
-        "merged": {
-            "type": ["null", "boolean"]
+        "title": {
+          "type": "string"
         },
-        "protected": {
-            "type": ["null", "boolean"]
+        "message": {
+          "type": "string"
         },
-        "developers_can_push": {
-            "type": ["null", "boolean"]
+        "author_name": {
+          "type": "string"
         },
-        "developers_can_merge": {
-            "type": ["null", "boolean"]
+        "author_email": {
+          "type": "string"
         },
-        "commit_id": {
-            "type": ["null", "string"]
+        "authored_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "committer_name": {
+          "type": "string"
+        },
+        "committer_email": {
+          "type": "string"
+        },
+        "committed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trailers": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "extended_trailers": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "web_url": {
+          "type": "string"
         }
+      }
     }
+  },
+  "required": ["name", "commit"]
 }

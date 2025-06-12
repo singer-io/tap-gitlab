@@ -22,12 +22,12 @@ class BaseTest(BaseCase):
     @staticmethod
     def tap_name():
         """The name of the tap."""
-        return "tap-"
+        return "tap-gitlab"
     
     @staticmethod
     def get_type():
         """The name of the tap."""
-        return "platform."
+        return "platform.gitlab"
 
     @classmethod
     def expected_metadata(cls):
@@ -111,6 +111,8 @@ class BaseTest(BaseCase):
             if value is None:
                 LOGGER.warning(f"Environment variable {env_var} not set.")
             credentials_dict[key] = value
+        for cred in creds:
+            credentials_dict[cred] = os.getenv(creds[cred])
 
         return credentials_dict
 
