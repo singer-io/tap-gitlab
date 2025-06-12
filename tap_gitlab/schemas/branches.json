@@ -1,88 +1,91 @@
 {
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string"
-    },
-    "merged": {
-      "type": "boolean"
-    },
-    "protected": {
-      "type": "boolean"
-    },
-    "default": {
-      "type": "boolean"
-    },
-    "developers_can_push": {
-      "type": "boolean"
-    },
-    "developers_can_merge": {
-      "type": "boolean"
-    },
-    "can_push": {
-      "type": "boolean"
-    },
-    "web_url": {
-      "type": "string"
-    },
-    "commit": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "short_id": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "parent_ids": {
-          "type": "array",
-          "items": {
+    "type": "object",
+    "properties": {
+        "name": {
             "type": "string"
-          }
         },
-        "title": {
-          "type": "string"
+        "merged": {
+            "type": "boolean"
         },
-        "message": {
-          "type": "string"
+        "protected": {
+            "type": "boolean"
         },
-        "author_name": {
-          "type": "string"
+        "default": {
+            "type": "boolean"
         },
-        "author_email": {
-          "type": "string"
+        "developers_can_push": {
+            "type": "boolean"
         },
-        "authored_date": {
-          "type": "string",
-          "format": "date-time"
+        "developers_can_merge": {
+            "type": "boolean"
         },
-        "committer_name": {
-          "type": "string"
-        },
-        "committer_email": {
-          "type": "string"
-        },
-        "committed_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "trailers": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "extended_trailers": {
-          "type": "object",
-          "additionalProperties": true
+        "can_push": {
+            "type": "boolean"
         },
         "web_url": {
-          "type": "string"
+            "type": "string"
+        },
+        "commit": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "short_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "parent_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "author_name": {
+                    "type": "string"
+                },
+                "author_email": {
+                    "type": "string"
+                },
+                "authored_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "committer_name": {
+                    "type": "string"
+                },
+                "committer_email": {
+                    "type": "string"
+                },
+                "committed_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "trailers": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "extended_trailers": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "web_url": {
+                    "type": "string"
+                }
+            }
         }
-      }
-    }
-  },
-  "required": ["name", "commit"]
+    },
+    "required": [
+        "name",
+        "commit"
+    ]
 }

@@ -1,46 +1,78 @@
 {
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "integer"
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "iid": {
+            "type": "integer"
+        },
+        "group_id": {
+            "type": "integer"
+        },
+        "title": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "description": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "state": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "created_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "updated_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "start_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "due_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "expired": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "web_url": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
     },
-    "iid": {
-      "type": "integer"
-    },
-    "group_id": {
-      "type": "integer"
-    },
-    "title": {
-      "type": ["null", "string"]
-    },
-    "description": {
-      "type": ["null", "string"]
-    },
-    "state": {
-      "type": ["null", "string"]
-    },
-    "created_at": {
-      "type": ["null", "string"],
-      "format": "date-time"
-    },
-    "updated_at": {
-      "type": ["null", "string"],
-      "format": "date-time"
-    },
-    "start_date": {
-      "type": ["null", "string"],
-      "format": "date-time"
-    },
-    "due_date": {
-      "type": ["null", "string"],
-      "format": "date-time"
-    },
-    "expired": {
-      "type": ["null", "boolean"]
-    },
-    "web_url": {
-      "type": ["null", "string"]
-    }
-  },
-  "required": ["id", "iid", "title", "state"]
+    "required": [
+        "id",
+        "iid",
+        "title",
+        "state"
+    ]
 }

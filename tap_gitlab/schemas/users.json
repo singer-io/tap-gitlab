@@ -1,26 +1,44 @@
 {
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "integer"
-    },
-    "username": {
-      "type": ["null", "string"]
-    },
-    "name": {
-      "type": ["null", "string"]
-    },
-    "state": {
-      "type": ["null", "string"]
-    },
-    "locked": {
-      "type": ["null", "boolean"]
-    },
-    "avatar_url": {
-      "type": ["null", "string"]
-    },
-    "web_url": {
-      "type": ["null", "string"]
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "username": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "state": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "locked": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "avatar_url": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "web_url": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
     }
-  }
 }
