@@ -1,40 +1,46 @@
 {
-    "type": "object",
-    "properties": {
-        "id": {
-            "type": ["null", "integer"]
-        },
-        "iid": {
-            "type": ["null", "integer"]
-        },
-        "project_id": {
-            "type": ["null", "integer"]
-        },
-        "group_id": {
-            "type": ["null", "integer"]
-        },
-        "title": {
-            "type": ["null", "string"]
-        },
-        "description": {
-            "type": ["null", "string"]
-        },
-        "due_date": {
-            "type": ["null", "string"]
-        },
-        "start_date": {
-            "type": ["null", "string"]
-        },
-        "state": {
-            "type": ["null", "string"]
-        },
-        "updated_at": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "created_at": {
-            "type": "string",
-            "format": "date-time"
-        }
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "iid": {
+      "type": "integer"
+    },
+    "group_id": {
+      "type": "integer"
+    },
+    "title": {
+      "type": ["null", "string"]
+    },
+    "description": {
+      "type": ["null", "string"]
+    },
+    "state": {
+      "type": ["null", "string"]
+    },
+    "created_at": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "start_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "due_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "expired": {
+      "type": ["null", "boolean"]
+    },
+    "web_url": {
+      "type": ["null", "string"]
     }
+  },
+  "required": ["id", "iid", "title", "state"]
 }
