@@ -58,13 +58,12 @@ class Client:
 
     def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
         """Authenticates the request using dynamic header/token keys."""
-        auth_header_key = self.config.get("auth_header_key")
-        auth_token_key = self.config.get("auth_token_key")
+        params = params or {}
+        params['private_token'] = self.config.get("private_token")
 
-        if auth_header_key and auth_token_key:
-            headers[auth_header_key] = self.config.get(auth_token_key)
-        else:
-            raise ValueError("Missing 'auth_header_key' or 'auth_token_key' in config.json")
+        headers = {}
+        if "user_agent" in self.config.get("user_agent", {}):
+            headers["User-Agent"] = self.config.get("user_agent")
 
         return headers, params
 

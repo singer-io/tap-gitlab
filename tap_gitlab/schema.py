@@ -89,9 +89,6 @@ def get_schemas() -> Tuple[Dict, Dict]:
 
         mdata = metadata.to_map(mdata_list)
 
-        # Add selected: true to top-level
-        mdata = metadata.write(mdata, (), "selected", True)
-
         # Set inclusion=automatic for replication keys
         properties = schema.get("properties", {})
         for field_name in properties.keys():
