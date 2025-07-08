@@ -15,7 +15,7 @@ jobs:
       - run:
           name: 'Pylint'
           command: |
-            source ~/.virtualenvs/tap-fullstory/bin/activate
+            source ~/.virtualenvs/tap-gitlab/bin/activate
             pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled
 
 workflows:
