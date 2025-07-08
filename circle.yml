@@ -1,11 +1,12 @@
-machine:
-  python:
-    version: 3.4.4
+jobs:
+  machine:
+    python:
+      version: 3.4.4
 
-dependencies:
-  pre:
-    - pip install pylint
+  dependencies:
+    pre:
+      - pip install pylint
 
-test:
-  post:
-    - pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled
+  test:
+    post:
+      - pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled
