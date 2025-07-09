@@ -2,13 +2,22 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "iid": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "project_id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "title": {
             "type": [
@@ -29,37 +38,25 @@
             ]
         },
         "created_at": {
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                {
-                    "type": "null"
-                }
-            ]
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         },
         "updated_at": {
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                {
-                    "type": "null"
-                }
-            ]
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         },
         "closed_at": {
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                {
-                    "type": "null"
-                }
-            ]
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         },
         "web_url": {
             "type": [
@@ -74,9 +71,15 @@
             ]
         },
         "labels": {
-            "type": "array",
+            "type": [
+                "null",
+                "array"
+            ],
             "items": {
-                "type": "string"
+                "type": [
+                    "null",
+                    "string"
+                ]
             }
         },
         "assignee_id": {
@@ -116,21 +119,36 @@
             ]
         },
         "assignees": {
-            "type": "array",
+            "type": [
+                "null",
+                "array"
+            ],
             "items": {
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": "integer"
+                        "type": [
+                            "null",
+                            "integer"
+                        ]
                     },
                     "username": {
-                        "type": "string"
+                        "type": [
+                            "null",
+                            "string"
+                        ]
                     },
                     "name": {
-                        "type": "string"
+                        "type": [
+                            "null",
+                            "string"
+                        ]
                     },
                     "state": {
-                        "type": "string"
+                        "type": [
+                            "null",
+                            "string"
+                        ]
                     },
                     "avatar_url": {
                         "type": [
@@ -139,25 +157,43 @@
                         ]
                     },
                     "web_url": {
-                        "type": "string"
+                        "type": [
+                            "null",
+                            "string"
+                        ]
                     }
                 }
             }
         },
         "author": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "username": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "name": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "state": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "avatar_url": {
                     "type": [
@@ -166,7 +202,10 @@
                     ]
                 },
                 "web_url": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 }
             }
         },
@@ -177,13 +216,22 @@
             ],
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "project_id": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "title": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "description": {
                     "type": [
@@ -192,7 +240,10 @@
                     ]
                 },
                 "state": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "created_at": {
                     "type": [
@@ -215,18 +266,30 @@
                     ]
                 },
                 "iid": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 }
             }
         },
         "time_stats": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "time_estimate": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "total_time_spent": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "human_time_estimate": {
                     "type": [
@@ -243,19 +306,34 @@
             }
         },
         "_links": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "self": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "notes": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "award_emoji": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "project": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "closed_as_duplicate_of": {
                     "type": [
@@ -266,32 +344,56 @@
             }
         },
         "references": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "short": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "relative": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "full": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 }
             }
         },
         "task_completion_status": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "count": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "completed_count": {
-                    "type": "integer"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 }
             }
         },
         "has_tasks": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "task_status": {
             "type": [
@@ -318,25 +420,46 @@
             ]
         },
         "imported": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "imported_from": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "merge_requests_count": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "downvotes": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "upvotes": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "discussion_locked": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "type": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         }
     }
 }

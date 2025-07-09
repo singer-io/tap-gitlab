@@ -2,13 +2,22 @@
     "type": "object",
     "properties": {
         "project_id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "id": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "short_id": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "title": {
             "type": [
@@ -68,9 +77,15 @@
             ]
         },
         "parent_ids": {
-            "type": "array",
+            "type": [
+                "null",
+                "array"
+            ],
             "items": {
-                "type": "string"
+                "type": [
+                    "null",
+                    "string"
+                ]
             }
         },
         "web_url": {
@@ -80,17 +95,32 @@
             ]
         },
         "trailers": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "additionalProperties": {
-                "type": "string"
+                "type": [
+                    "null",
+                    "string"
+                ]
             }
         },
         "extended_trailers": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "additionalProperties": {
-                "type": "array",
+                "type": [
+                    "null",
+                    "array"
+                ],
                 "items": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 }
             }
         }

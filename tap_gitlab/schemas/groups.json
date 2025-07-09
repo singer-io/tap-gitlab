@@ -3,6 +3,7 @@
     "properties": {
         "id": {
             "type": [
+                "null",
                 "integer",
                 "string"
             ]
@@ -89,7 +90,10 @@
                 "type": "object",
                 "properties": {
                     "group_id": {
-                        "type": "integer"
+                        "type": [
+                            "null",
+                            "integer"
+                        ]
                     },
                     "group_name": {
                         "type": [

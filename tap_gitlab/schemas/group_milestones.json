@@ -2,13 +2,22 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "iid": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "group_id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "title": {
             "type": [

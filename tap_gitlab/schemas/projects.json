@@ -3,56 +3,56 @@
     "properties": {
         "id": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "description": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "description_html": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "default_branch": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "visibility": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "ssh_url_to_repo": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "http_url_to_repo": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "web_url": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "readme_url": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "tag_list": {
@@ -83,26 +83,26 @@
         },
         "owner": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "id": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "name": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "created_at": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ],
                     "format": "date-time"
                 }
@@ -110,146 +110,146 @@
         },
         "name": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "name_with_namespace": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "path": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "path_with_namespace": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "issues_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "open_issues_count": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "merge_requests_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "jobs_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "wiki_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "snippets_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "can_create_merge_request_in": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "resolve_outdated_diff_discussions": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "container_registry_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "container_registry_access_level": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "security_and_compliance_access_level": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "container_expiration_policy": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "cadence": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "enabled": {
                     "type": [
-                        "boolean",
-                        "null"
+                        "null",
+                        "boolean"
                     ]
                 },
                 "keep_n": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "older_than": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "name_regex": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "name_regex_delete": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "name_regex_keep": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "next_run_at": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ],
                     "format": "date-time"
                 }
@@ -257,147 +257,147 @@
         },
         "created_at": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ],
             "format": "date-time"
         },
         "updated_at": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ],
             "format": "date-time"
         },
         "last_activity_at": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ],
             "format": "date-time"
         },
         "creator_id": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "namespace": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "id": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "name": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "path": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "kind": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "full_path": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "avatar_url": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "web_url": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 }
             }
         },
         "import_url": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "import_type": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "import_status": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "import_error": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "permissions": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "project_access": {
                     "type": [
-                        "object",
-                        "null"
+                        "null",
+                        "object"
                     ],
                     "properties": {
                         "access_level": {
                             "type": [
-                                "integer",
-                                "null"
+                                "null",
+                                "integer"
                             ]
                         },
                         "notification_level": {
                             "type": [
-                                "integer",
-                                "null"
+                                "null",
+                                "integer"
                             ]
                         }
                     }
                 },
                 "group_access": {
                     "type": [
-                        "object",
-                        "null"
+                        "null",
+                        "object"
                     ],
                     "properties": {
                         "access_level": {
                             "type": [
-                                "integer",
-                                "null"
+                                "null",
+                                "integer"
                             ]
                         },
                         "notification_level": {
                             "type": [
-                                "integer",
-                                "null"
+                                "null",
+                                "integer"
                             ]
                         }
                     }
@@ -406,118 +406,118 @@
         },
         "archived": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "avatar_url": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "license_url": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "license": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "key": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "name": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "nickname": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "html_url": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "source_url": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 }
             }
         },
         "shared_runners_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "group_runners_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "forks_count": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "star_count": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "runners_token": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "ci_default_git_depth": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "ci_forward_deployment_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "ci_forward_deployment_rollback_allowed": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "ci_allow_fork_pipelines_to_run_in_parent_project": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "ci_id_token_sub_claim_components": {
             "type": [
-                "array",
-                "null"
+                "null",
+                "array"
             ],
             "items": {
                 "type": "string"
@@ -525,38 +525,38 @@
         },
         "ci_separated_caches": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "ci_restrict_pipeline_cancellation_role": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "ci_pipeline_variables_minimum_override_role": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "ci_push_repository_for_job_token_allowed": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "public_jobs": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "shared_with_groups": {
             "type": [
-                "array",
-                "null"
+                "null",
+                "array"
             ],
             "items": {
                 "type": "object",
@@ -578,196 +578,196 @@
         },
         "repository_storage": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "only_allow_merge_if_pipeline_succeeds": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "allow_merge_on_skipped_pipeline": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "allow_pipeline_trigger_approve_deployment": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "restrict_user_defined_variables": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "only_allow_merge_if_all_discussions_are_resolved": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "remove_source_branch_after_merge": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "printing_merge_requests_link_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "request_access_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "merge_method": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "squash_option": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "auto_devops_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "auto_devops_deploy_strategy": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "approvals_before_merge": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "mirror": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "mirror_user_id": {
             "type": [
-                "integer",
-                "null"
+                "null",
+                "integer"
             ]
         },
         "mirror_trigger_builds": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "only_mirror_protected_branches": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "mirror_overwrites_diverged_branches": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "external_authorization_classification_label": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "packages_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "service_desk_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "service_desk_address": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "autoclose_referenced_issues": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "suggestion_commit_message": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "enforce_auth_checks_on_uploads": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "merge_commit_template": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "squash_commit_template": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "issue_branch_template": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "marked_for_deletion_at": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ],
             "format": "date"
         },
         "marked_for_deletion_on": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ],
             "format": "date"
         },
         "compliance_frameworks": {
             "type": [
-                "array",
-                "null"
+                "null",
+                "array"
             ],
             "items": {
                 "type": "string"
@@ -775,148 +775,148 @@
         },
         "warn_about_potentially_unwanted_characters": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "secret_push_protection_enabled": {
             "type": [
-                "boolean",
-                "null"
+                "null",
+                "boolean"
             ]
         },
         "statistics": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "commit_count": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "storage_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "repository_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "wiki_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "lfs_objects_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "job_artifacts_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "pipeline_artifacts_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "packages_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "snippets_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "uploads_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 },
                 "container_registry_size": {
                     "type": [
-                        "integer",
-                        "null"
+                        "null",
+                        "integer"
                     ]
                 }
             }
         },
         "container_registry_image_prefix": {
             "type": [
-                "string",
-                "null"
+                "null",
+                "string"
             ]
         },
         "_links": {
             "type": [
-                "object",
-                "null"
+                "null",
+                "object"
             ],
             "properties": {
                 "self": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "issues": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "merge_requests": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "repo_branches": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "labels": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "events": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "members": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 },
                 "cluster_agents": {
                     "type": [
-                        "string",
-                        "null"
+                        "null",
+                        "string"
                     ]
                 }
             }

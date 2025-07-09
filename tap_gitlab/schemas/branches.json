@@ -1,88 +1,166 @@
 {
     "type": "object",
     "properties": {
-      "project_id": {
-        "type": ["null","integer"]
-      }, 
-      "name": {
-            "type": "string"
+        "project_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "name": {
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "merged": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "protected": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "default": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "developers_can_push": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "developers_can_merge": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "can_push": {
-            "type": "boolean"
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "web_url": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "commit": {
-            "type": "object",
+            "type": [
+                "null",
+                "object"
+            ],
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "short_id": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "created_at": {
-                    "type": "string",
+                    "type": [
+                        "null",
+                        "string"
+                    ],
                     "format": "date-time"
                 },
                 "parent_ids": {
-                    "type": "array",
+                    "type": [
+                        "null",
+                        "array"
+                    ],
                     "items": {
-                        "type": "string"
+                        "type": [
+                            "null",
+                            "string"
+                        ]
                     }
                 },
                 "title": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "message": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "author_name": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "author_email": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "authored_date": {
-                    "type": "string",
+                    "type": [
+                        "null",
+                        "string"
+                    ],
                     "format": "date-time"
                 },
                 "committer_name": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "committer_email": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "committed_date": {
-                    "type": "string",
+                    "type": [
+                        "null",
+                        "string"
+                    ],
                     "format": "date-time"
                 },
                 "trailers": {
-                    "type": "object",
+                    "type": [
+                        "null",
+                        "object"
+                    ],
                     "additionalProperties": true
                 },
                 "extended_trailers": {
-                    "type": "object",
+                    "type": [
+                        "null",
+                        "object"
+                    ],
                     "additionalProperties": true
                 },
                 "web_url": {
-                    "type": "string"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 }
             }
         }
