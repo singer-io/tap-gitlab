@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='tap-gitlab',
@@ -18,7 +18,7 @@ setup(
         [console_scripts]
         tap-gitlab=tap_gitlab:main
     ''',
-    packages=['tap_gitlab'],
+    packages=find_packages(),
     package_data={
         'tap_gitlab': ['schemas/*.json', 'schemas/shared/*.json']
     },
