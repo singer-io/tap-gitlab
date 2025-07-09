@@ -1,7 +1,10 @@
 {
     "type": "object",
     "properties": {
-        "name": {
+      "project_id": {
+        "type": ["null","integer"]
+      }, 
+      "name": {
             "type": "string"
         },
         "merged": {
