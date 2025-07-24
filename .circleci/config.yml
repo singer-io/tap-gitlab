@@ -8,14 +8,14 @@ jobs:
       - run:
           name: 'Setup'
           command: |
-            uv venv --python=3.9 ~/.virtualenvs/tap-gitlab
-            source ~/.virtualenvs/tap-gitlab/bin/activate
+            uv venv --python=3.9 /usr/local/share/virtualenvs/tap-gitlab
+            source /usr/local/share/tap-gitlab/bin/activate
             pip install .
             pip install pylint
       - run:
           name: 'Pylint'
           command: |
-            source ~/.virtualenvs/tap-gitlab/bin/activate
+            source /usr/local/share/tap-gitlab/bin/activate
             pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled,line-too-long,fixme,consider-using-f-string,redefined-builtin,use-yield-from,broad-exception-raised
 
 workflows:
