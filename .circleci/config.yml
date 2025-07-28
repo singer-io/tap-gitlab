@@ -8,7 +8,7 @@ jobs:
       - run:
           name: 'Setup'
           command: |
-            uv venv --python=3.9 /usr/local/share/virtualenvs/tap-gitlab
+            uv venv --python 3.9 /usr/local/share/virtualenvs/tap-gitlab
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
             uv pip install .
             uv pip install pylint
