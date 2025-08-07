@@ -2,20 +2,20 @@ version: 2
 jobs:
   build:
     docker:
-      - image: 218546966473.dkr.ecr.us-east-1.amazonaws.com/circle-ci:stitch-tap-tester
+      - image: 218546966473.dkr.ecr.us-east-1.amazonaws.com/circle-ci:stitch-tap-tester-uv
     steps:
       - checkout
       - run:
           name: 'Setup'
           command: |
-            virtualenv -p python3 ~/.virtualenvs/tap-gitlab
-            source ~/.virtualenvs/tap-gitlab/bin/activate
-            pip install .
-            pip install pylint
+            uv venv --python 3.9 /usr/local/share/virtualenvs/tap-gitlab
+            source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
+            uv pip install .
+            uv pip install pylint
       - run:
           name: 'Pylint'
           command: |
-            source ~/.virtualenvs/tap-gitlab/bin/activate
+            source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
             pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled,line-too-long,fixme,consider-using-f-string,redefined-builtin,use-yield-from,broad-exception-raised
 
 workflows:
