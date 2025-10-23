@@ -95,7 +95,7 @@ def get_start(entity):
                       factor=2)
 def request(url, params=None):
     params = params or {}
-    params['private_token'] = CONFIG['private_token']
+    headers['private_token'] = CONFIG['private_token']
 
     headers = {}
     if 'user_agent' in CONFIG:
