@@ -97,7 +97,7 @@ def request(url, params=None):
     params = params or {}
 
     headers = {}
-    headers['private_token'] = CONFIG['private_token']
+    headers['Private-Token'] = CONFIG['private_token']
     if 'user_agent' in CONFIG:
         headers['User-Agent'] = CONFIG['user_agent']
 
