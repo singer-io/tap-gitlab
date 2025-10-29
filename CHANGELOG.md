@@ -1,6 +1,7 @@
 # Changelog
 ## 0.5.3
-  * addresses bug ticket [SAC-28608](https://qlik-dev.atlassian.net/browse/SAC-28608) by moving private token from the params to the header "PRIVATE-TOKEN"
+  * Moves private token from the params to the header "PRIVATE-TOKEN" [#44](https://github.com/singer-io/tap-gitlab/pull/44)
+
 ## 0.5.2
   * Bump dependency versions for twistlock compliance
   * Update circle config to fix failing build
