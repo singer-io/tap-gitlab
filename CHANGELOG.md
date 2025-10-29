@@ -1,4 +1,6 @@
 # Changelog
+## 0.5.3
+  * Moves private token from the params to the header "PRIVATE-TOKEN" [#44](https://github.com/singer-io/tap-gitlab/pull/44)
 
 ## 0.5.2
   * Bump dependency versions for twistlock compliance
