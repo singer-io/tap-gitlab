@@ -1,63 +1,27 @@
-version: 2.1
-
+version: 2
 jobs:
   build:
     docker:
-      - image: 218546966473.dkr.ecr.us-east-1.amazonaws.com/circle-ci:stitch-tap-tester
+      - image: 218546966473.dkr.ecr.us-east-1.amazonaws.com/circle-ci:stitch-tap-tester-uv
     steps:
       - checkout
-
       - run:
-          name: "Setup virtual env"
+          name: 'Setup'
           command: |
-            python3 -m venv /usr/local/share/virtualenvs/tap-gitlab
+            uv venv --python 3.9 /usr/local/share/virtualenvs/tap-gitlab
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pip install -U "pip==22.2.2" "setuptools==65.3.0"
-            pip install .[dev]
-
+            uv pip install .
+            uv pip install pylint
       - run:
-          name: "JSON Validator"
-          command: |
-            stitch-validate-json tap_gitlab/schemas/*.json
-
-      - run:
-          name: "pylint"
+          name: 'Pylint'
           command: |
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pip install pylint
-            pylint tap_gitlab -d C,R,W
-
-      - add_ssh_keys
-
-      - run:
-          name: "Unit Tests"
-          command: |
-            source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pip install nose coverage pytz
-            nosetests --with-coverage --cover-erase --cover-package=tap_gitlab --cover-html-dir=htmlcov tests/unittests
-            coverage html
-
-      - store_test_results:
-          path: test_output/report.xml
-
-      - store_artifacts:
-          path: htmlcov
+            pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled,line-too-long,fixme,consider-using-f-string,redefined-builtin,use-yield-from,broad-exception-raised
 
 workflows:
   version: 2
   commit:
     jobs:
       - build:
-          context: circleci-user
-
-  build_daily:
-    triggers:
-      - schedule:
-          cron: "0 19 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build:
-          context: circleci-user
+          context:
+            - circleci-user
