@@ -16,7 +16,7 @@ jobs:
           name: 'Pylint'
           command: |
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pylint tap_outbrain -d C,R,W
+            pylint tap_gitlab -d C,R,W
 
 workflows:
   version: 2
