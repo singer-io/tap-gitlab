@@ -16,7 +16,7 @@ jobs:
           name: 'Pylint'
           command: |
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
-            pylint tap_gitlab --disable missing-docstring,logging-format-interpolation,locally-disabled,line-too-long,fixme,consider-using-f-string,redefined-builtin,use-yield-from,broad-exception-raised
+            pylint tap_gitlab -d C,R,W
 
 workflows:
   version: 2

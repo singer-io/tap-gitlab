@@ -1,39 +1,134 @@
 {
     "type": "object",
     "properties": {
-        "id": {
-            "type": "string"
-        },
         "project_id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "id": {
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "short_id": {
-            "type": "string"
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "title": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "author_name": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "author_email": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "authored_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         },
         "committer_name": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "committer_email": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "committed_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         },
         "created_at": {
-            "type": "string",
+            "type": [
+                "null",
+                "string"
+            ],
             "format": "date-time"
         },
         "message": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
-        "allow_failure": {
-            "type": ["null", "boolean"]
+        "parent_ids": {
+            "type": [
+                "null",
+                "array"
+            ],
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            }
+        },
+        "web_url": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "trailers": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "additionalProperties": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            }
+        },
+        "extended_trailers": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "additionalProperties": {
+                "type": [
+                    "null",
+                    "array"
+                ],
+                "items": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
         }
-    }
+    },
+    "required": [
+        "id",
+        "short_id",
+        "title",
+        "message"
+    ]
 }
