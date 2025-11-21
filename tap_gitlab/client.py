@@ -40,7 +40,8 @@ class Client:
     def __init__(self, config: Mapping[str, Any]) -> None:
         self.config = config
         self._session = session()
-        self.base_url = config.get("api_url", "https://gitlab.com/api/v4")
+        self.base_url = "https://gitlab.com/api/v4"
+        LOGGER.info(f"Base URL set to: {self.base_url}")
 
         config_request_timeout = config.get("request_timeout")
         self.request_timeout = float(config_request_timeout) if config_request_timeout else REQUEST_TIMEOUT
@@ -61,8 +62,7 @@ class Client:
         params = params or {}
         params['private_token'] = self.config.get("private_token")
 
-        headers = {}
-        if "user_agent" in self.config.get("user_agent", {}):
+        if isinstance(headers, dict) and "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
 
         return headers, params

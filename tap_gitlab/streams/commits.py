@@ -18,7 +18,7 @@ class Commits(IncrementalStream):
             raise ValueError("parent_obj is required but got None in Commits.get_url()")
         project_identifier = parent_obj.get("path_with_namespace") or parent_obj.get("id")
         encoded_identifier = quote(str(project_identifier), safe="")
-        return f"/projects/{encoded_identifier}/repository/commits"
+        return f"projects/{encoded_identifier}/repository/commits"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         return f"{self.client.base_url}{self.get_url(parent_obj)}"

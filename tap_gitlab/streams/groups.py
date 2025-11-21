@@ -10,9 +10,10 @@ class Groups(IncrementalStream):
     key_properties = ["id"]
     replication_method = "INCREMENTAL"
     replication_keys = ["created_at"]  # Use a datetime-based field
-    path = "/groups"
+    path = "groups"
     data_key = None
     bookmark_value = None
+    children = ["group_milestones"]
 
     def __init__(self, client, catalog):
         super().__init__(client, catalog)

@@ -16,14 +16,14 @@ class BaseTest(BaseCase):
 
     Metadata describing streams. A bunch of shared methods that are used
     in tap-tester tests. Shared tap-specific methods (as needed).
-    """    
+    """
     start_date = "2019-01-01T00:00:00Z"
 
     @staticmethod
     def tap_name():
         """The name of the tap."""
         return "tap-gitlab"
-    
+
     @staticmethod
     def get_type():
         """The name of the tap."""
@@ -41,7 +41,7 @@ class BaseTest(BaseCase):
                 cls.API_LIMIT: 100
             },
             "branches": {
-                cls.PRIMARY_KEYS: { "project_id, name" },
+                cls.PRIMARY_KEYS: { "project_id", "name" },
                 cls.REPLICATION_METHOD: cls.full_table,
                 cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
@@ -97,7 +97,7 @@ class BaseTest(BaseCase):
         credentials_dict = {}
         creds = {
             "api_url": "TAP_GITLAB_API_URL",
-            "private_token": "TAP_GITLAB_PRIVATE_TOKEN",
+            "private_token": "TAB_GITLAB_PRIVATE_TOKEN",
             "auth_header_key": "TAB_GITLAB_AUTH_HEADER_KEY",
             "auth_token_key": "TAP_GITLAB_AUTH_TOKEN_KEY",
             "groups": "TAP_GITLAB_GROUPS",

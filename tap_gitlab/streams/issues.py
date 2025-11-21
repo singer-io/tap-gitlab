@@ -28,7 +28,7 @@ class Issues(IncrementalStream):
             LOGGER.error("Missing project identifier in parent_obj.")
             return None
         encoded_identifier = quote(str(project_identifier), safe="")
-        return f"/projects/{encoded_identifier}/issues"
+        return f"projects/{encoded_identifier}/issues"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         url = self.get_url(parent_obj)

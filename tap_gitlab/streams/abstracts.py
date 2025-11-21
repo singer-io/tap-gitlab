@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Tuple, List
+from typing import Any, Dict, Tuple, Iterator
 from singer import (
     Transformer,
     get_bookmark,
@@ -66,8 +66,8 @@ class BaseStream(ABC):
     ) -> Dict:
         pass
 
-    def get_records(self) -> List:
-        self.params[""] = self.page_size
+    def get_records(self) -> Iterator:
+        self.params["per_page"] = self.page_size
         next_page = 1
         while next_page:
             response = self.client.get(

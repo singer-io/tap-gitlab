@@ -9,5 +9,6 @@ class Projects(IncrementalStream):
     key_properties = ["id"]
     replication_method = "INCREMENTAL"
     replication_keys = ["updated_at"]  # Use this instead of "last_activity_at"
-    path = "/projects"
+    path = "projects"
     data_key = None
+    children = ["branches", "issues", "merge_requests", "pipelines", "commits", "project_milestones", "users"]

@@ -29,11 +29,11 @@ class NotFoundError(Error):
     pass
 
 class ConflictError(Error):
-    """class representing 406 status code."""
+    """class representing 409 status code."""
     pass
 
 class UnprocessableEntityError(BackoffError):
-    """class representing 409 status code."""
+    """class representing 422 status code."""
     pass
 
 class RateLimitError(BackoffError):

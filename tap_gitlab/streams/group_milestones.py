@@ -22,7 +22,7 @@ class GroupMilestones(IncrementalStream):
     def get_url(self, parent_obj: Dict[str, Any]) -> str:
         group_identifier = parent_obj.get("full_path") or parent_obj.get("id")
         encoded_identifier = quote(group_identifier, safe="")
-        return f"/groups/{encoded_identifier}/milestones"
+        return f"groups/{encoded_identifier}/milestones"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         return f"{self.client.base_url}{self.get_url(parent_obj)}"

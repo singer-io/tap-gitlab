@@ -8,7 +8,7 @@ LOGGER = get_logger()
 class Users(IncrementalStream):
     tap_stream_id = "users"
     key_properties = ["id"]
-    replication_method = "INCREMENTAL"
+    replication_method = "INCREMENTAL" # need to verify if this is correct
     parent = "projects"
     replication_keys = None
     data_key = None
@@ -30,7 +30,7 @@ class Users(IncrementalStream):
             return None
 
         encoded_project_id = quote(str(project_id), safe="")
-        return f"/projects/{encoded_project_id}/users"
+        return f"projects/{encoded_project_id}/users"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         url = self.get_url(parent_obj)

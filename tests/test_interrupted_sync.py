@@ -17,7 +17,7 @@ class InterruptedSyncTest(BaseTest):
 
     def manipulate_state(self):
         return {
-            "currently_syncing": "prospects",
+            "currently_syncing": "projects",
             "bookmarks": {
         }
     }

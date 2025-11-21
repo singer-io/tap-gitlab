@@ -28,9 +28,16 @@ class Branches(IncrementalStream):
             raise ValueError(f"Missing 'path_with_namespace' or 'project_id' in parent_obj: {parent_obj}")
 
         encoded_identifier = quote(str(project_identifier), safe="")
-        return f"/projects/{encoded_identifier}/repository/branches"
+        return f"projects/{encoded_identifier}/repository/branches"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         endpoint = f"{self.client.base_url}{self.get_url(parent_obj)}"
         LOGGER.info(f"[branches] Constructed endpoint: {endpoint}")
         return endpoint
+
+    def modify_object(self, record, parent_record = None):
+        """Handle cases where record is a string instead of a dict."""
+        if isinstance(record, dict):
+            record["project_id"] = parent_record.get("id")
+
+        return record
