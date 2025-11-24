@@ -7,6 +7,12 @@
                 "integer"
             ]
         },
+        "project_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
         "username": {
             "type": [
                 "null",

@@ -54,7 +54,6 @@ class Client:
         self._session.close()
 
     def check_api_credentials(self) -> None:
-        # Optionally implement credential check logic
         pass
 
     def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
@@ -96,6 +95,9 @@ class Client:
         with metrics.http_request_timer(endpoint) as timer:
             response = self._session.request(method, endpoint, **kwargs)
             raise_for_error(response)
+
+            # Store response headers for pagination
+            self.last_response_headers = response.headers
 
         return response.json()
 

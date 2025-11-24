@@ -18,7 +18,7 @@ LOGGER = get_logger()
 class BaseStream(ABC):
     url_endpoint = ""
     path = ""
-    page_size = 0
+    page_size = 100
     next_page_key = ""
     headers = {}
     children = []
@@ -67,21 +67,40 @@ class BaseStream(ABC):
         pass
 
     def get_records(self) -> Iterator:
+        """Interacts with API client interaction and pagination."""
         self.params["per_page"] = self.page_size
-        next_page = 1
-        while next_page:
+        current_page = 1
+        has_more_pages = True
+
+        while has_more_pages:
+            self.params["page"] = current_page
+
             response = self.client.get(
                 self.url_endpoint, self.params, self.headers, self.path
             )
+
             if isinstance(response, list):
                 raw_records = response
-                next_page = None
             else:
-                raw_records = response.get(self.data_key, [])
-                next_page = response.get(self.next_page_key)
+                raw_records = response.get(self.data_key, []) if self.data_key else response
 
-            self.params[self.next_page_key] = next_page
             yield from raw_records
+
+            # Check pagination headers from client response
+            # GitLab returns x-next-page header when there's a next page
+            response_headers = getattr(self.client, 'last_response_headers', {})
+            x_next_page = response_headers.get('x-next-page') or response_headers.get('X-Next-Page')
+
+            if x_next_page:
+                # GitLab indicates next page exists
+                current_page += 1
+                has_more_pages = True
+            elif not raw_records or len(raw_records) < self.page_size:
+                # No more pages if empty response or fewer records than page_size
+                has_more_pages = False
+            else:
+                # Try next page, will stop if empty
+                current_page += 1
 
     def write_schema(self) -> None:
         write_schema(self.tap_stream_id, self.schema, self.key_properties)
@@ -148,10 +167,7 @@ class IncrementalStream(BaseStream):
         return record
 
     def sync(self, state: Dict, transformer: Transformer, parent_obj: Dict = None) -> Dict:
-        if self.parent and parent_obj is None:
-            LOGGER.warning(f"Skipping top-level sync for child stream '{self.tap_stream_id}'")
-            return {}
-
+        """Abstract implementation for `type: Incremental` stream."""
         bookmark_value = self.get_bookmark(state, self.tap_stream_id)
         bookmark_date = self._to_utc_datetime(bookmark_value)
 
@@ -187,7 +203,6 @@ class IncrementalStream(BaseStream):
                         LOGGER.warning("Timestamp comparison failed, keeping current bookmark")
 
                     for child in self.child_to_sync:
-                        LOGGER.info(f"Triggering sync for child stream: {child.tap_stream_id}")
                         child.sync(state=state, transformer=transformer, parent_obj=record)
 
             state = self.update_bookmark_state(  # pylint: disable=E1121
@@ -197,3 +212,31 @@ class IncrementalStream(BaseStream):
                 value=current_max_bookmark_date.isoformat()
             )
             return counter.value
+
+    class FullTableStream(BaseStream):
+        """Base Class for FullTable Stream."""
+
+        replication_keys = []
+
+        def sync(
+            self,
+            state: Dict,
+            transformer: Transformer,
+            parent_obj: Dict = None,
+        ) -> Dict:
+            """Abstract implementation for `type: Fulltable` stream."""
+            self.url_endpoint = self.get_url_endpoint(parent_obj)
+            with metrics.record_counter(self.tap_stream_id) as counter:
+                for record in self.get_records():
+                    record = self.modify_object(record, parent_obj)
+                    transformed_record = transformer.transform(
+                        record, self.schema, self.metadata
+                    )
+                    if self.is_selected():
+                        write_record(self.tap_stream_id, transformed_record)
+                        counter.increment()
+
+                    for child in self.child_to_sync:
+                        child.sync(state=state, transformer=transformer, parent_obj=record)
+
+                return counter.value

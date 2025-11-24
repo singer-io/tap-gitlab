@@ -1,23 +1,17 @@
 from typing import Dict, Any
 from urllib.parse import quote
 from singer import get_bookmark, get_logger
-from tap_gitlab.streams.abstracts import IncrementalStream
+from tap_gitlab.streams.abstracts import FullTableStream
 
 LOGGER = get_logger()
 
-class Users(IncrementalStream):
+class Users(FullTableStream):
     tap_stream_id = "users"
-    key_properties = ["id"]
-    replication_method = "INCREMENTAL" # need to verify if this is correct
+    key_properties = ["id", "project_id"]
+    replication_method = "FULL_TABLE"
     parent = "projects"
     replication_keys = None
     data_key = None
-    bookmark_value = None
-
-    def get_bookmark(self, state: Dict, key: Any = None) -> int:
-        if not self.bookmark_value:
-            self.bookmark_value = super().get_bookmark(state, key)
-        return self.bookmark_value
 
     def get_url(self, parent_obj: Dict[str, Any]) -> str:
         if not parent_obj:
@@ -36,4 +30,11 @@ class Users(IncrementalStream):
         url = self.get_url(parent_obj)
         if not url:
             return ""
-        return f"{self.client.base_url}{url}"
+        return f"{self.client.base_url}/{url}"
+
+    def modify_object(self, record, parent_record = None):
+        """Adding project_id to the record."""
+        if isinstance(record, dict):
+            record["project_id"] = parent_record.get("id")
+
+        return record

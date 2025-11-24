@@ -7,7 +7,7 @@ LOGGER = get_logger()
 
 class GroupMilestones(IncrementalStream):
     tap_stream_id = "group_milestones"
-    key_properties = ["id"]
+    key_properties = ["id", "group_id"]
     replication_method = "INCREMENTAL"
     parent = "groups"
     replication_keys = ["updated_at"]
@@ -25,4 +25,4 @@ class GroupMilestones(IncrementalStream):
         return f"groups/{encoded_identifier}/milestones"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
-        return f"{self.client.base_url}{self.get_url(parent_obj)}"
+        return f"{self.client.base_url}/{self.get_url(parent_obj)}"

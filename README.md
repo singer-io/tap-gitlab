@@ -5,14 +5,14 @@ This is a [Singer](https://singer.io) tap that produces JSON-formatted data foll
 This tap:
 - Pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html)
 - Extracts the following resources from GitLab:
-  - [Branches](https://docs.gitlab.com/ee/api/branches.html)
-  - [Commits](https://docs.gitlab.com/ee/api/commits.html)
-  - [Issues](https://docs.gitlab.com/ee/api/issues.html)
-  - [Projects](https://docs.gitlab.com/ee/api/projects.html)
-  - [Project milestones](https://docs.gitlab.com/ee/api/milestones.html)
-  - [Users](https://docs.gitlab.com/ee/api/users.html)
-  - [Groups](https://docs.gitlab.com/ee/api/group_milestones.html)
-  - [Group Milestones](https://docs.gitlab.com/ee/api/users.html)
+  - [Branches](https://docs.gitlab.com/api/branches/#list-repository-branches)
+  - [Commits](https://docs.gitlab.com/api/commits/#list-repository-commits)
+  - [Issues](https://docs.gitlab.com/api/issues/#list-issues)
+  - [Projects](https://docs.gitlab.com/api/projects/#list-all-projects)
+  - [Project milestones](https://docs.gitlab.com/api/milestones/#list-project-milestones)
+  - [Users](https://docs.gitlab.com/api/projects/#list-users)
+  - [Groups](https://docs.gitlab.com/api/groups/#list-all-groups)
+  - [Group Milestones](https://docs.gitlab.com/api/group_milestones/#list-group-milestones)
 - Outputs the schema for each resource
 - Incrementally pulls data based on the input state
 

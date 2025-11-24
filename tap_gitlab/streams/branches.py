@@ -31,12 +31,12 @@ class Branches(IncrementalStream):
         return f"projects/{encoded_identifier}/repository/branches"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
-        endpoint = f"{self.client.base_url}{self.get_url(parent_obj)}"
+        endpoint = f"{self.client.base_url}/{self.get_url(parent_obj)}"
         LOGGER.info(f"[branches] Constructed endpoint: {endpoint}")
         return endpoint
 
     def modify_object(self, record, parent_record = None):
-        """Handle cases where record is a string instead of a dict."""
+        """Adding project_id to the record."""
         if isinstance(record, dict):
             record["project_id"] = parent_record.get("id")
 

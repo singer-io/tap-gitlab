@@ -7,7 +7,7 @@ LOGGER = get_logger()
 
 class Issues(IncrementalStream):
     tap_stream_id = "issues"
-    key_properties = ["id"]
+    key_properties = ["id", "project_id"]
     replication_method = "INCREMENTAL"
     parent = "projects"
     replication_keys = ["updated_at"]
@@ -34,4 +34,11 @@ class Issues(IncrementalStream):
         url = self.get_url(parent_obj)
         if not url:
             return ""
-        return f"{self.client.base_url}{url}"
+        return f"{self.client.base_url}/{url}"
+
+    def modify_object(self, record, parent_record = None):
+        """Adding project_id to the record."""
+        if isinstance(record, dict):
+            record["project_id"] = parent_record.get("id")
+
+        return record

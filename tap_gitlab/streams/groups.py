@@ -15,14 +15,6 @@ class Groups(IncrementalStream):
     bookmark_value = None
     children = ["group_milestones"]
 
-    def __init__(self, client, catalog):
-        super().__init__(client, catalog)
-
-        # Register child stream so it pulls after each group
-        self.child_to_sync = [
-            GroupMilestones(client, catalog)
-        ]
-
     def get_bookmark(self, state: Dict, key: Any = None) -> int:
         """
         Return initial bookmark value.

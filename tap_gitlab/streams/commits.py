@@ -7,7 +7,7 @@ LOGGER = get_logger()
 
 class Commits(IncrementalStream):
     tap_stream_id = "commits"
-    key_properties = ["id"]
+    key_properties = ["id", "project_id"]
     replication_method = "INCREMENTAL"
     parent = "projects"
     replication_keys = ["created_at"]
@@ -21,4 +21,11 @@ class Commits(IncrementalStream):
         return f"projects/{encoded_identifier}/repository/commits"
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
-        return f"{self.client.base_url}{self.get_url(parent_obj)}"
+        return f"{self.client.base_url}/{self.get_url(parent_obj)}"
+
+    def modify_object(self, record, parent_record = None):
+        """Adding project_id to the record."""
+        if isinstance(record, dict):
+            record["project_id"] = parent_record.get("id")
+
+        return record
