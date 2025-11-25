@@ -213,30 +213,30 @@ class IncrementalStream(BaseStream):
             )
             return counter.value
 
-    class FullTableStream(BaseStream):
-        """Base Class for FullTable Stream."""
+class FullTableStream(BaseStream):
+    """Base Class for FullTable Stream."""
 
-        replication_keys = []
+    replication_keys = []
 
-        def sync(
-            self,
-            state: Dict,
-            transformer: Transformer,
-            parent_obj: Dict = None,
-        ) -> Dict:
-            """Abstract implementation for `type: Fulltable` stream."""
-            self.url_endpoint = self.get_url_endpoint(parent_obj)
-            with metrics.record_counter(self.tap_stream_id) as counter:
-                for record in self.get_records():
-                    record = self.modify_object(record, parent_obj)
-                    transformed_record = transformer.transform(
-                        record, self.schema, self.metadata
-                    )
-                    if self.is_selected():
-                        write_record(self.tap_stream_id, transformed_record)
-                        counter.increment()
+    def sync(
+        self,
+        state: Dict,
+        transformer: Transformer,
+        parent_obj: Dict = None,
+    ) -> Dict:
+        """Abstract implementation for `type: Fulltable` stream."""
+        self.url_endpoint = self.get_url_endpoint(parent_obj)
+        with metrics.record_counter(self.tap_stream_id) as counter:
+            for record in self.get_records():
+                record = self.modify_object(record, parent_obj)
+                transformed_record = transformer.transform(
+                    record, self.schema, self.metadata
+                )
+                if self.is_selected():
+                    write_record(self.tap_stream_id, transformed_record)
+                    counter.increment()
 
-                    for child in self.child_to_sync:
-                        child.sync(state=state, transformer=transformer, parent_obj=record)
+                for child in self.child_to_sync:
+                    child.sync(state=state, transformer=transformer, parent_obj=record)
 
-                return counter.value
+            return counter.value
