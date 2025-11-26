@@ -1,4 +1,7 @@
 # Changelog
+## 0.6.0
+  * Made new changes to add metadata fields and refactoring code. [#37](https://github.com/singer-io/tap-gitlab/pull/37)
+
 ## 0.5.3
   * Moves private token from the params to the header "PRIVATE-TOKEN" [#44](https://github.com/singer-io/tap-gitlab/pull/44)
 

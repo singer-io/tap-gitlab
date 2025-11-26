@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tap-gitlab',
-    version='0.5.1',
+    version='0.6.0',
     description='Singer.io tap for extracting data from the GitLab API',
     author='Stitch',
     url='https://singer.io',
