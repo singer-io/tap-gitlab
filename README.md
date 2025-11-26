@@ -44,6 +44,9 @@ This tap:
     - filling in 'groups' but leaving 'projects' empty will sync all group projects.
     - filling in 'projects' but leaving 'groups' empty will sync selected projects.
     - filling in 'groups' and 'groups' will sync selected projects of those groups.
+    - filling in 'projects' and 'groups' both will sync all selected projects and all group projects.
+    - 'groups' contains space separated list of groups id.
+    - 'projects' contains space separated list of projects id.
 
     ```json
     {

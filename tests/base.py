@@ -35,43 +35,43 @@ class BaseTest(BaseCase):
         return {
             "projects": {
                 cls.PRIMARY_KEYS: { "id" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "updated_at" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "branches": {
                 cls.PRIMARY_KEYS: { "project_id", "name" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "last_committed_date" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "commits": {
                 cls.PRIMARY_KEYS: { "id", "project_id" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "committed_date" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "issues": {
                 cls.PRIMARY_KEYS: { "id", "project_id" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "updated_at" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "project_milestones": {
                 cls.PRIMARY_KEYS: { "id", "project_id" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "updated_at" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "group_milestones": {
                 cls.PRIMARY_KEYS: { "id", "group_id" },
-                cls.REPLICATION_METHOD: cls.full_table,
-                cls.REPLICATION_KEYS: set(),
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: { "updated_at" },
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
