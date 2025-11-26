@@ -15,5 +15,5 @@ STREAMS = {
     "project_milestones": ProjectMilestones,
     "group_milestones": GroupMilestones,
     "users": Users,
-    "groups": Groups,
+    "groups": Groups
 }

@@ -146,13 +146,24 @@
                 "null",
                 "boolean"
             ]
+        },
+         "projects": {
+            "anyOf": [
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "null"
+                }
+            ]
         }
-    },
-    "required": [
-        "id",
-        "name",
-        "path",
-        "visibility",
-        "web_url"
-    ]
+    }
 }

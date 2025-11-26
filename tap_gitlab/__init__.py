@@ -8,7 +8,7 @@ from tap_gitlab.sync import sync
 LOGGER = singer.get_logger()
 
 
-REQUIRED_CONFIG_KEYS = ["private_token", "start_date", "groups"]
+REQUIRED_CONFIG_KEYS = ["private_token", "start_date", "groups", "projects"]
 
 
 def do_discover():

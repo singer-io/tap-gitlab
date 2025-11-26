@@ -38,7 +38,49 @@ class UnprocessableEntityError(BackoffError):
 
 class RateLimitError(BackoffError):
     """class representing 429 status code."""
-    pass
+    def __init__(self, message=None, response=None):
+        """Initialize the RateLimitError. Parses the rate limit headers from the response."""
+        self.response = response
+        self.retry_after = None
+        self.limit = None
+        self.remaining = None
+        self.reset = None
+
+        if response is not None:
+            headers = response.headers or {}
+
+            # GitLab uses ratelimit-* headers (lowercase)
+            self.limit = headers.get('ratelimit-limit') or headers.get('RateLimit-Limit')
+            self.remaining = headers.get('ratelimit-remaining') or headers.get('RateLimit-Remaining')
+            self.reset = headers.get('ratelimit-reset') or headers.get('RateLimit-Reset')
+
+            # Check for Retry-After header
+            retry_after_header = headers.get('Retry-After') or headers.get('retry-after')
+            if retry_after_header:
+                try:
+                    self.retry_after = int(retry_after_header)
+                except (ValueError, TypeError):
+                    self.retry_after = 60
+            elif self.reset:
+                # Calculate retry_after from reset timestamp
+                try:
+                    import time
+                    reset_timestamp = int(self.reset)
+                    current_timestamp = int(time.time())
+                    self.retry_after = max(reset_timestamp - current_timestamp, 0)
+                except (ValueError, TypeError):
+                    self.retry_after = 60
+            else:
+                self.retry_after = 60
+
+        base_msg = message or "GitLab API rate limit exhausted"
+        retry_info = (
+            f"(Retry after {self.retry_after} seconds. Limit: {self.limit}, Remaining: {self.remaining})"
+            if self.retry_after is not None
+            else "(Retry after unknown delay.)"
+        )
+        full_message = f"{base_msg} {retry_info}"
+        super().__init__(full_message, response=response)
 
 class InternalServerError(BackoffError):
     """class representing 500 status code."""

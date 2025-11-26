@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Tuple, Iterator
+from urllib.parse import quote
 from singer import (
     Transformer,
     get_bookmark,
@@ -29,8 +30,8 @@ class BaseStream(ABC):
     def __init__(self, client=None, catalog=None) -> None:
         self.client = client
         self.catalog = catalog
-        self.schema = catalog.schema.to_dict()
-        self.metadata = metadata.to_map(catalog.metadata)
+        self.schema = self.catalog.schema.to_dict() if self.catalog else None
+        self.metadata = metadata.to_map(self.catalog.metadata) if self.catalog else None
         self.child_to_sync = []
         self.params = {}
 
@@ -240,3 +241,29 @@ class FullTableStream(BaseStream):
                     child.sync(state=state, transformer=transformer, parent_obj=record)
 
             return counter.value
+
+class ChildBaseStream(IncrementalStream):
+    """Base Class for Child Stream."""
+    def get_bookmark(self, state: Dict, stream: str, key: Any = None) -> int:
+        """Singleton bookmark value for child streams."""
+        if not self.bookmark_value:
+            self.bookmark_value = super().get_bookmark(state, stream)
+
+        return self.bookmark_value
+
+    def get_url(self, parent_obj: Dict[str, Any]) -> str:
+        """Construct the URL for child stream using parent object id"""
+        if not parent_obj:
+            raise ValueError("parent_obj is required but got None")
+
+        project_identifier = parent_obj.get("id")
+        if not project_identifier:
+            raise ValueError(f"Missing 'id' in parent_obj: {parent_obj}")
+
+        encoded_identifier = quote(str(project_identifier), safe="")
+        return self.path.format(encoded_identifier)
+
+    def get_url_endpoint(self, parent_obj=None):
+        """Prepare URL endpoint for child streams."""
+        endpoint = f"{self.client.base_url}/{self.get_url(parent_obj)}"
+        return endpoint

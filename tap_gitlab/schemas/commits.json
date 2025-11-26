@@ -99,36 +99,14 @@
                 "null",
                 "object"
             ],
-            "additionalProperties": {
-                "type": [
-                    "null",
-                    "string"
-                ]
-            }
+            "additionalProperties": true
         },
         "extended_trailers": {
             "type": [
                 "null",
                 "object"
             ],
-            "additionalProperties": {
-                "type": [
-                    "null",
-                    "array"
-                ],
-                "items": {
-                    "type": [
-                        "null",
-                        "string"
-                    ]
-                }
-            }
+            "additionalProperties": true
         }
-    },
-    "required": [
-        "id",
-        "short_id",
-        "title",
-        "message"
-    ]
+    }
 }

@@ -35,8 +35,20 @@ def sync(client: Client, config: Dict, catalog: singer.Catalog, state) -> None:
     LOGGER.info("last/currently syncing stream: {}".format(last_stream))
 
     with singer.Transformer() as transformer:
+        # Check if we need to skip projects independent sync
+        should_skip_projects = "projects" in streams_to_sync and "groups" in streams_to_sync
+
         for stream_name in streams_to_sync:
             stream = STREAMS[stream_name](client, catalog.get_stream(stream_name))
+            # Skip projects if groups is also selected - groups will handle projects sync
+            if stream_name == "projects" and should_skip_projects:
+                # Check if projects is actually selected or just added because of children
+                if stream.is_selected():
+                    LOGGER.info("Skipping projects independent sync - will be synced by groups")
+                    continue
+                else:
+                    LOGGER.info("Projects not selected but children are - will sync as parent")
+                    # Let it continue to sync as a parent for its children
 
             if stream.parent:
                 if stream.parent not in streams_to_sync:
@@ -47,7 +59,15 @@ def sync(client: Client, config: Dict, catalog: singer.Catalog, state) -> None:
             LOGGER.info(f"START Syncing: {stream_name}")
             update_currently_syncing(state, stream_name)
 
-            total_records = stream.sync(state=state, transformer=transformer)
+            if stream_name == "groups":
+                total_records = stream.sync(
+                    state=state,
+                    transformer=transformer,
+                    streams_to_sync=streams_to_sync,
+                    catalog=catalog
+                )
+            else:
+                total_records = stream.sync(state=state, transformer=transformer)
 
             update_currently_syncing(state, None)
             LOGGER.info(f"FINISHED Syncing: {stream_name}, total_records: {total_records}")

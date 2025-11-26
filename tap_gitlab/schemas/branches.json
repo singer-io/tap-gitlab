@@ -163,10 +163,13 @@
                     ]
                 }
             }
+        },
+        "last_commited_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
         }
-    },
-    "required": [
-        "name",
-        "commit"
-    ]
+    }
 }

@@ -6,10 +6,45 @@ from requests import session
 from requests.exceptions import Timeout, ConnectionError, ChunkedEncodingError
 from singer import get_logger, metrics
 
-from tap_gitlab.exceptions import ERROR_CODE_EXCEPTION_MAPPING, Error, BackoffError
+from tap_gitlab.exceptions import (
+    ERROR_CODE_EXCEPTION_MAPPING,
+    Error,
+    RateLimitError,
+    InternalServerError,
+    ServiceUnavailableError,
+    UnprocessableEntityError
+)
 
 LOGGER = get_logger()
 REQUEST_TIMEOUT = 300
+
+
+def wait_if_retry_after(exception_info):
+    """
+    Handle rate limit backoff by using the retry_after value from RateLimitError.
+    Returns the number of seconds to wait.
+    """
+    exception = exception_info.get('exception') if isinstance(exception_info, dict) else exception_info
+
+    if exception and isinstance(exception, RateLimitError):
+        retry_after = exception.retry_after or 60
+        LOGGER.info(
+            f"GitLab rate limit hit. Waiting {retry_after} seconds. "
+            f"Limit: {exception.limit}, Remaining: {exception.remaining}, Reset: {exception.reset}"
+        )
+
+        if exception.response:
+            response = exception.response
+            headers = response.headers or {}
+            limit = headers.get('ratelimit-limit') or headers.get('RateLimit-Limit')
+            remaining = headers.get('ratelimit-remaining') or headers.get('RateLimit-Remaining')
+            if limit and remaining:
+                LOGGER.info(f"Rate limit info - Limit: {limit}, Remaining: {remaining}")
+
+        return retry_after
+    else:
+        LOGGER.info("Rate limit hit. Waiting 60 seconds as default.")
+        return 60
 
 
 def raise_for_error(response: requests.Response) -> None:
@@ -85,10 +120,21 @@ class Client:
             ConnectionError,
             ChunkedEncodingError,
             Timeout,
-            BackoffError
+            InternalServerError,
+            ServiceUnavailableError,
+            UnprocessableEntityError
         ),
         max_tries=5,
         factor=2,
+    )
+    @backoff.on_exception(
+        backoff.runtime,
+        exception=(
+            RateLimitError,
+        ),
+        max_tries=5,
+        value=wait_if_retry_after,
+        jitter=None
     )
     def __make_request(self, method: str, endpoint: str, **kwargs) -> Optional[Mapping[Any, Any]]:
         """Performs the actual HTTP request with backoff and error handling."""
