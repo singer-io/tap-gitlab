@@ -26,6 +26,7 @@ class BaseStream(ABC):
     parent = ""
     data_key = None
     parent_bookmark_key = ""
+    bookmark_value = None
 
     def __init__(self, client=None, catalog=None) -> None:
         self.client = client
