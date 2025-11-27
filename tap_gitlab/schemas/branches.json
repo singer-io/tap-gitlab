@@ -164,7 +164,7 @@
                 }
             }
         },
-        "last_commited_date": {
+        "last_committed_date": {
             "type": [
                 "null",
                 "string"
