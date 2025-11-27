@@ -34,57 +34,57 @@ class BaseTest(BaseCase):
         """The expected streams and metadata about the streams."""
         return {
             "projects": {
-                cls.PRIMARY_KEYS: { "id" },
+                cls.PRIMARY_KEYS: {"id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "updated_at" },
+                cls.REPLICATION_KEYS: {"updated_at"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "branches": {
-                cls.PRIMARY_KEYS: { "project_id", "name" },
+                cls.PRIMARY_KEYS: {"project_id", "name"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "last_committed_date" },
+                cls.REPLICATION_KEYS: {"last_committed_date"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "commits": {
-                cls.PRIMARY_KEYS: { "id", "project_id" },
+                cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "committed_date" },
+                cls.REPLICATION_KEYS: {"committed_date"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "issues": {
-                cls.PRIMARY_KEYS: { "id", "project_id" },
+                cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "updated_at" },
+                cls.REPLICATION_KEYS: {"updated_at"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "project_milestones": {
-                cls.PRIMARY_KEYS: { "id", "project_id" },
+                cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "updated_at" },
+                cls.REPLICATION_KEYS: {"updated_at"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "group_milestones": {
-                cls.PRIMARY_KEYS: { "id", "group_id" },
+                cls.PRIMARY_KEYS: {"id", "group_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: { "updated_at" },
+                cls.REPLICATION_KEYS: {"updated_at"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "users": {
-                cls.PRIMARY_KEYS: { "id", "project_id" },
-                cls.REPLICATION_METHOD: cls.full_table,
+                cls.PRIMARY_KEYS: {"id", "project_id"},
+                cls.REPLICATION_METHOD: cls.FULL_TABLE,
                 cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
             },
             "groups": {
-                cls.PRIMARY_KEYS: { "id" },
-                cls.REPLICATION_METHOD: cls.full_table,
+                cls.PRIMARY_KEYS: {"id"},
+                cls.REPLICATION_METHOD: cls.FULL_TABLE,
                 cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 100
@@ -96,8 +96,8 @@ class BaseTest(BaseCase):
         """Authentication information for the test account."""
         credentials_dict = {}
         creds = {
-            "private_token": "TAB_GITLAB_PRIVATE_TOKEN",
-            "auth_header_key": "TAB_GITLAB_AUTH_HEADER_KEY",
+            "private_token": "TAP_GITLAB_PRIVATE_TOKEN",
+            "auth_header_key": "TAP_GITLAB_AUTH_HEADER_KEY",
             "auth_token_key": "TAP_GITLAB_AUTH_TOKEN_KEY",
             "groups": "TAP_GITLAB_GROUPS",
             "projects": "TAP_GITLAB_PROJECTS",
@@ -109,8 +109,6 @@ class BaseTest(BaseCase):
             if value is None:
                 LOGGER.warning(f"Environment variable {env_var} not set.")
             credentials_dict[key] = value
-        for cred in creds:
-            credentials_dict[cred] = os.getenv(creds[cred])
 
         return credentials_dict
 

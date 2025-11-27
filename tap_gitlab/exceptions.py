@@ -86,7 +86,7 @@ class InternalServerError(BackoffError):
     """class representing 500 status code."""
     pass
 
-class NotImplementedError(BackoffError):
+class APINotImplementedError(BackoffError):
     """class representing 501 status code."""
     pass
 
@@ -133,7 +133,7 @@ ERROR_CODE_EXCEPTION_MAPPING = {
             " it from fulfilling the request."
     },
     501: {
-        "raise_exception": NotImplementedError,
+        "raise_exception": APINotImplementedError,
         "message": "The server does not support the functionality required to fulfill the request."
     },
     502: {
