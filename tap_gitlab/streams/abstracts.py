@@ -156,7 +156,7 @@ class IncrementalStream(BaseStream):
                 return value.replace(tzinfo=timezone.utc)
             return value.astimezone(timezone.utc)
         if isinstance(value, (int, float)):
-            return datetime.utcfromtimestamp(value).replace(tzinfo=timezone.utc)
+            return datetime.fromtimestamp(value).replace(tzinfo=timezone.utc)
         if isinstance(value, str):
             dt = parser.parse(value)
             if dt.tzinfo is None:
@@ -178,7 +178,7 @@ class IncrementalStream(BaseStream):
             bookmark_date = self._to_utc_datetime(self.client.config["start_date"])
 
         current_max_bookmark_date = bookmark_date
-        self.update_params(updated_since=bookmark_date.isoformat())
+        self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
         self.url_endpoint = self.get_url_endpoint(parent_obj)
 
         with metrics.record_counter(self.tap_stream_id) as counter:
@@ -211,7 +211,7 @@ class IncrementalStream(BaseStream):
                 state=state,
                 stream=self.tap_stream_id,
                 key=None,
-                value=current_max_bookmark_date.isoformat()
+                value=current_max_bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z')
             )
             return counter.value
 

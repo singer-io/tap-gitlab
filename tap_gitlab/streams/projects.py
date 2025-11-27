@@ -56,16 +56,11 @@ class Projects(IncrementalStream):
             project_ids = self.get_project_ids()
 
         for project_id in project_ids:
-            try:
-                self._current_project_id = project_id
-                endpoint = self.get_url_endpoint()
-                response = self.client.get(endpoint, self.params, self.headers, None)
+            self._current_project_id = project_id
+            endpoint = self.get_url_endpoint()
+            response = self.client.get(endpoint, self.params, self.headers, None)
 
-                if isinstance(response, dict):
-                    yield response
-                else:
-                    LOGGER.warning(f"Unexpected response type for project {project_id}: {type(response)}")
-
-            except Exception as e:
-                LOGGER.error(f"Error fetching project {project_id}: {str(e)}")
-                continue
+            if isinstance(response, dict):
+                yield response
+            else:
+                LOGGER.warning(f"Unexpected response type for project {project_id}: {type(response)}")
