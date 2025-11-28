@@ -1,22 +1,22 @@
 {
     "type": "object",
     "properties": {
-        "project_id": {
+        "id": {
             "type": [
                 "null",
                 "integer"
             ]
         },
-        "id": {
+        "iid": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
-        "short_id": {
+        "group_id": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "title": {
@@ -25,43 +25,17 @@
                 "string"
             ]
         },
-        "author_name": {
+        "description": {
             "type": [
                 "null",
                 "string"
             ]
         },
-        "author_email": {
+        "state": {
             "type": [
                 "null",
                 "string"
             ]
-        },
-        "authored_date": {
-            "type": [
-                "null",
-                "string"
-            ],
-            "format": "date-time"
-        },
-        "committer_name": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "committer_email": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "committed_date": {
-            "type": [
-                "null",
-                "string"
-            ],
-            "format": "date-time"
         },
         "created_at": {
             "type": [
@@ -70,43 +44,44 @@
             ],
             "format": "date-time"
         },
-        "message": {
+        "updated_at": {
             "type": [
                 "null",
                 "string"
-            ]
+            ],
+            "format": "date-time"
         },
-        "parent_ids": {
+        "start_date": {
             "type": [
                 "null",
-                "array"
+                "string"
             ],
-            "items": {
-                "type": [
-                    "null",
-                    "string"
-                ]
-            }
+            "format": "date-time"
+        },
+        "due_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "expired": {
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "web_url": {
             "type": [
                 "null",
                 "string"
             ]
-        },
-        "trailers": {
-            "type": [
-                "null",
-                "object"
-            ],
-            "additionalProperties": true
-        },
-        "extended_trailers": {
-            "type": [
-                "null",
-                "object"
-            ],
-            "additionalProperties": true
         }
-    }
+    },
+    "required": [
+        "id",
+        "iid",
+        "title",
+        "state"
+    ]
 }

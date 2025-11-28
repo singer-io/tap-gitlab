@@ -1,75 +1,465 @@
 {
     "type": "object",
     "properties": {
-        "project_id": {
-            "type": "integer"
-        },
-        "milestone_id": {
-            "type": ["null", "integer"]
-        },
-        "author_id": {
-            "type": ["null", "integer"]
-        },
-        "assignee_id": {
-            "type": ["null", "integer"]
-        },
-        "description": {
-            "type": ["null", "string"]
-        },
-        "state": {
-            "type": ["null", "string"]
-        },
         "id": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "iid": {
-            "type": "integer"
+            "type": [
+                "null",
+                "integer"
+            ]
         },
-        "labels": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+        "project_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
         },
         "title": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
-        "updated_at": {
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                {
-                    "type": "null"
-                }
+        "description": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "state": {
+            "type": [
+                "null",
+                "string"
             ]
         },
         "created_at": {
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                {
-                    "type": "null"
-                }
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "updated_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "closed_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "web_url": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "due_date": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "labels": {
+            "type": [
+                "null",
+                "array"
+            ],
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            }
+        },
+        "assignee_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "milestone_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "author_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "user_notes_count": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "confidential": {
+            "type": [
+                "null",
+                "boolean"
             ]
         },
         "subscribed": {
-            "type": ["null", "boolean"]
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
-        "user_notes_count": {
-            "type": ["null", "integer"]
+        "assignees": {
+            "type": [
+                "null",
+                "array"
+            ],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": [
+                            "null",
+                            "integer"
+                        ]
+                    },
+                    "username": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "name": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "state": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "avatar_url": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "web_url": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    }
+                }
+            }
         },
-        "due_date": {
-            "type": ["null", "string"]
+        "author": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "id": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "username": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "name": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "state": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "avatar_url": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "web_url": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
         },
-        "web_url": {
-            "type": ["null", "string"]
+        "milestone": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "id": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "project_id": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "title": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "description": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "state": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "created_at": {
+                    "type": [
+                        "null",
+                        "string"
+                    ],
+                    "format": "date-time"
+                },
+                "updated_at": {
+                    "type": [
+                        "null",
+                        "string"
+                    ],
+                    "format": "date-time"
+                },
+                "due_date": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "iid": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                }
+            }
         },
-        "confidential": {
-            "type": ["null", "boolean"]
+        "time_stats": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "time_estimate": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "total_time_spent": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "human_time_estimate": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "human_total_time_spent": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
+        },
+        "_links": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "self": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "notes": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "award_emoji": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "project": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "closed_as_duplicate_of": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
+        },
+        "references": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "short": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "relative": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "full": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
+        },
+        "task_completion_status": {
+            "type": [
+                "null",
+                "object"
+            ],
+            "properties": {
+                "count": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                },
+                "completed_count": {
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
+                }
+            }
+        },
+        "has_tasks": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "task_status": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "issue_type": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "severity": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "moved_to_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "imported": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "imported_from": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "merge_requests_count": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "downvotes": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "upvotes": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "discussion_locked": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "type": {
+            "type": [
+                "null",
+                "string"
+            ]
         }
     }
 }

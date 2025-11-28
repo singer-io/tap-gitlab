@@ -7,19 +7,37 @@
                 "integer"
             ]
         },
+        "iid": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
         "project_id": {
             "type": [
                 "null",
                 "integer"
             ]
         },
-        "username": {
+        "title": {
             "type": [
                 "null",
                 "string"
             ]
         },
-        "name": {
+        "description": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "due_date": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "start_date": {
             "type": [
                 "null",
                 "string"
@@ -31,22 +49,24 @@
                 "string"
             ]
         },
-        "locked": {
+        "updated_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "created_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "expired": {
             "type": [
                 "null",
                 "boolean"
-            ]
-        },
-        "avatar_url": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "web_url": {
-            "type": [
-                "null",
-                "string"
             ]
         }
     }

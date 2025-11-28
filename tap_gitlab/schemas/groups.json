@@ -2,39 +2,152 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": ["null", "integer"]
+            "type": [
+                "null",
+                "integer",
+                "string"
+            ]
         },
         "name": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "path": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "description": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
-        "visibility_level": {
-            "type": ["null", "integer"]
-        },
-        "lfs_enabled": {
-            "type": ["null", "boolean"]
+        "visibility": {
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "avatar_url": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "web_url": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "request_access_enabled": {
-            "type": ["null", "boolean"]
+            "type": [
+                "null",
+                "boolean"
+            ]
         },
         "full_name": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
         "full_path": {
-            "type": ["null", "string"]
+            "type": [
+                "null",
+                "string"
+            ]
         },
-        "projects": {
+        "repository_storage": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "parent_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "created_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
+        "shared_with_groups": {
+            "type": [
+                "null",
+                "array"
+            ],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "group_id": {
+                        "type": [
+                            "null",
+                            "integer"
+                        ]
+                    },
+                    "group_name": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "group_full_path": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "group_access_level": {
+                        "type": [
+                            "null",
+                            "integer"
+                        ]
+                    },
+                    "expires_at": {
+                        "type": [
+                            "null",
+                            "string"
+                        ],
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "prevent_sharing_groups_outside_hierarchy": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "ip_restriction_ranges": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "math_rendering_limits_enabled": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        "lock_math_rendering_limits_enabled": {
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+         "projects": {
             "anyOf": [
                 {
                     "type": "array",
