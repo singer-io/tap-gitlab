@@ -17,13 +17,13 @@ class Groups(FullTableStream):
     children = ["group_milestones"]
 
     def get_group_ids(self) -> list:
-        """Parse space-separated group IDs from config."""
+        """Parse comma and/or space-separated group IDs from config."""
         groups_str = self.client.config.get("groups", "")
         if not groups_str:
             LOGGER.warning("No groups specified in config")
             return []
 
-        group_ids = groups_str.strip().split()
+        group_ids = groups_str.replace(",", " ").split()
         LOGGER.info(f"Found {len(group_ids)} group IDs: {group_ids}")
         return group_ids
 
