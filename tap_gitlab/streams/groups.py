@@ -85,7 +85,7 @@ class Groups(FullTableStream):
 
         projects_stream = Projects(self.client, catalog.get_stream(Projects.tap_stream_id))
 
-        if projects_stream.is_selected():
+        if projects_stream.is_selected() and "groups" in streams_to_sync:
             # Get config project IDs
             config_projects = self.client.config.get("projects", "").strip().split()
             config_project_ids = set(config_projects) if config_projects and config_projects[0] else set()

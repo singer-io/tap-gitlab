@@ -30,9 +30,10 @@ def get_mock_response(status_code=200, json_data=None, raise_error=False, header
 
 class TestClientRequests(unittest.TestCase):
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", return_value=get_mock_response(200, {"status": "ok"}))
-    def test_get_success(self, mock_request, mock_auth):
+    def test_get_success(self, mock_request, mock_auth, mock_check_creds):
         config = {
             "api_url": "https://gitlab.com/api/v4",
             "auth_header_key": "Authorization",
@@ -45,36 +46,40 @@ class TestClientRequests(unittest.TestCase):
             self.assertEqual(response, {"status": "ok"})
             mock_request.assert_called_once()
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", side_effect=ConnectionError)
-    def test_get_connection_error(self, mock_request, mock_auth):
+    def test_get_connection_error(self, mock_request, mock_auth, mock_check_creds):
         config = {"api_url": "https://gitlab.com/api/v4"}
         with self.assertRaises(ConnectionError):
             with Client(config) as client:
                 client.get(endpoint="dummy", params={}, headers={})
         self.assertEqual(mock_request.call_count, 5)
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", side_effect=Timeout)
-    def test_get_timeout_error(self, mock_request, mock_auth):
+    def test_get_timeout_error(self, mock_request, mock_auth, mock_check_creds):
         config = {"api_url": "https://gitlab.com/api/v4"}
         with self.assertRaises(Timeout):
             with Client(config) as client:
                 client.get(endpoint="dummy", params={}, headers={})
         self.assertEqual(mock_request.call_count, 5)
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", side_effect=ChunkedEncodingError)
-    def test_get_chunked_encoding_error(self, mock_request, mock_auth):
+    def test_get_chunked_encoding_error(self, mock_request, mock_auth, mock_check_creds):
         config = {"api_url": "https://gitlab.com/api/v4"}
         with self.assertRaises(ChunkedEncodingError):
             with Client(config) as client:
                 client.get(endpoint="dummy", params={}, headers={})
         self.assertEqual(mock_request.call_count, 5)
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", return_value=get_mock_response(429, {}, raise_error=True))
-    def test_rate_limit_error(self, mock_request, mock_auth):
+    def test_rate_limit_error(self, mock_request, mock_auth, mock_check_creds):
         mock_request.side_effect = [get_mock_response(429, {}, True)] * 5
         config = {"api_url": "https://gitlab.com/api/v4"}
         with self.assertRaises(BackoffError):
@@ -82,14 +87,11 @@ class TestClientRequests(unittest.TestCase):
                 client.get(endpoint="dummy", params={}, headers={})
         self.assertEqual(mock_request.call_count, 5)
 
+    @patch("tap_gitlab.client.Client.check_api_credentials")
     @patch("tap_gitlab.client.Client.authenticate", return_value=({}, {}))
     @patch("requests.Session.request", return_value=get_mock_response(500, {"message": "Internal Server Error"}, raise_error=True))
-    def test_generic_http_error(self, mock_request, mock_auth):
+    def test_generic_http_error(self, mock_request, mock_auth, mock_check_creds):
         config = {"api_url": "https://gitlab.com/api/v4"}
         with self.assertRaises(Error):
             with Client(config) as client:
                 client.get(endpoint="dummy", params={}, headers={})
-
-
-if __name__ == "__main__":
-    unittest.main()
