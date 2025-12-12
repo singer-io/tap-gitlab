@@ -87,8 +87,8 @@ class Groups(FullTableStream):
 
         if projects_stream.is_selected() and "groups" in streams_to_sync:
             # Get config project IDs
-            config_projects = self.client.config.get("projects", "").strip().split()
-            config_project_ids = set(config_projects) if config_projects and config_projects[0] else set()
+            config_projects = self.client.config.get("projects", "").strip().replace(",", " ").split()
+            config_project_ids = set(config_projects)
 
             # Get group project IDs (if any were collected)
             group_project_ids = self._collected_project_ids if hasattr(self, '_collected_project_ids') else set()

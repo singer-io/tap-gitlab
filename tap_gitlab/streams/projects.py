@@ -22,7 +22,7 @@ class Projects(IncrementalStream):
             LOGGER.warning("No projects specified in config")
             return []
 
-        project_ids = projects_str.replace(",", " ").split()
+        project_ids = projects_str.strip().replace(",", " ").split()
         LOGGER.info(f"Found {len(project_ids)} project IDs: {project_ids}")
         return project_ids
 
