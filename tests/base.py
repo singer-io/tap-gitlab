@@ -98,8 +98,7 @@ class BaseTest(BaseCase):
         creds = {
             "private_token": "TAP_GITLAB_PRIVATE_TOKEN",
             "groups": "TAP_GITLAB_GROUPS",
-            "projects": "TAP_GITLAB_PROJECTS",
-            "start_date": "TAP_GITLAB_START_DATE"
+            "projects": "TAP_GITLAB_PROJECTS"
         }
 
         for key, env_var in creds.items():
