@@ -50,7 +50,6 @@ This tap:
 
     ```json
     {
-        "api_url": "https://gitlab.com/api/v3",
         "private_token": "your-access-token",
         "groups": "myorg mygroup",
         "projects": "myorg/repo-a myorg/repo-b",
