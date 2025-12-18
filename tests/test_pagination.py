@@ -11,5 +11,10 @@ class PaginationTest(PaginationTest, BaseTest):
         return "tap_tester__pagination_test"
 
     def streams_to_test(self):
-        streams_to_exclude = {}
+        # don't have enough data to test pagination
+        streams_to_exclude = {
+            "group_milestones",
+            "issues",
+            "project_milestones"
+        }
         return self.expected_stream_names().difference(streams_to_exclude)

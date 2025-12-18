@@ -163,13 +163,6 @@
                     ]
                 }
             }
-        },
-        "last_committed_date": {
-            "type": [
-                "null",
-                "string"
-            ],
-            "format": "date-time"
         }
     }
 }

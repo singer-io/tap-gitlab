@@ -17,13 +17,13 @@ class Groups(FullTableStream):
     children = ["group_milestones"]
 
     def get_group_ids(self) -> list:
-        """Parse space-separated group IDs from config."""
+        """Parse comma and/or space-separated group IDs from config."""
         groups_str = self.client.config.get("groups", "")
         if not groups_str:
             LOGGER.warning("No groups specified in config")
             return []
 
-        group_ids = groups_str.strip().split()
+        group_ids = groups_str.replace(",", " ").split()
         LOGGER.info(f"Found {len(group_ids)} group IDs: {group_ids}")
         return group_ids
 
@@ -85,10 +85,10 @@ class Groups(FullTableStream):
 
         projects_stream = Projects(self.client, catalog.get_stream(Projects.tap_stream_id))
 
-        if projects_stream.is_selected():
+        if projects_stream.is_selected() and "groups" in streams_to_sync:
             # Get config project IDs
-            config_projects = self.client.config.get("projects", "").strip().split()
-            config_project_ids = set(config_projects) if config_projects and config_projects[0] else set()
+            config_projects = self.client.config.get("projects", "").strip().replace(",", " ").split()
+            config_project_ids = set(config_projects)
 
             # Get group project IDs (if any were collected)
             group_project_ids = self._collected_project_ids if hasattr(self, '_collected_project_ids') else set()

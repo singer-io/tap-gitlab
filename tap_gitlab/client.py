@@ -76,7 +76,6 @@ class Client:
         self.config = config
         self._session = session()
         self.base_url = "https://gitlab.com/api/v4"
-        LOGGER.info(f"Base URL set to: {self.base_url}")
 
         config_request_timeout = config.get("request_timeout")
         self.request_timeout = float(config_request_timeout) if config_request_timeout else REQUEST_TIMEOUT
@@ -89,7 +88,21 @@ class Client:
         self._session.close()
 
     def check_api_credentials(self) -> None:
-        pass
+        """Verify API credentials by making a test request."""
+        headers = {}
+        params = {'private_token': self.config.get("private_token")}
+        endpoint = f"{self.base_url}/user"
+
+        response = self._session.get(
+            endpoint,
+            params=params,
+            headers=headers,
+            timeout=self.request_timeout
+        )
+        raise_for_error(response)
+
+        user_data = response.json()
+        LOGGER.info(f"Successfully authenticated as user: {user_data.get('username', 'Unknown')}")
 
     def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
         """Authenticates the request using dynamic header/token keys."""

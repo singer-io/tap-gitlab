@@ -16,13 +16,13 @@ class Projects(IncrementalStream):
     children = ["branches", "issues", "commits", "project_milestones", "users"]
 
     def get_project_ids(self) -> list:
-        """Parse space-separated project IDs from config."""
+        """Parse comma and/or space-separated project IDs from config."""
         projects_str = self.client.config.get("projects", "")
         if not projects_str:
             LOGGER.warning("No projects specified in config")
             return []
 
-        project_ids = projects_str.strip().split()
+        project_ids = projects_str.strip().replace(",", " ").split()
         LOGGER.info(f"Found {len(project_ids)} project IDs: {project_ids}")
         return project_ids
 

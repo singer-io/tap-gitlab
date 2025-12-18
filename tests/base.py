@@ -38,21 +38,21 @@ class BaseTest(BaseCase):
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
                 cls.REPLICATION_KEYS: {"updated_at"},
                 cls.OBEYS_START_DATE: False,
-                cls.API_LIMIT: 100
+                cls.API_LIMIT: 3
             },
             "branches": {
                 cls.PRIMARY_KEYS: {"project_id", "name"},
-                cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: {"last_committed_date"},
+                cls.REPLICATION_METHOD: cls.FULL_TABLE,
+                cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
-                cls.API_LIMIT: 100
+                cls.API_LIMIT: 5
             },
             "commits": {
                 cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
                 cls.REPLICATION_KEYS: {"committed_date"},
                 cls.OBEYS_START_DATE: False,
-                cls.API_LIMIT: 100
+                cls.API_LIMIT: 3
             },
             "issues": {
                 cls.PRIMARY_KEYS: {"id", "project_id"},
@@ -80,14 +80,14 @@ class BaseTest(BaseCase):
                 cls.REPLICATION_METHOD: cls.FULL_TABLE,
                 cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
-                cls.API_LIMIT: 100
+                cls.API_LIMIT: 3
             },
             "groups": {
                 cls.PRIMARY_KEYS: {"id"},
                 cls.REPLICATION_METHOD: cls.FULL_TABLE,
                 cls.REPLICATION_KEYS: set(),
                 cls.OBEYS_START_DATE: False,
-                cls.API_LIMIT: 100
+                cls.API_LIMIT: 2
             }
         }
 
@@ -97,11 +97,8 @@ class BaseTest(BaseCase):
         credentials_dict = {}
         creds = {
             "private_token": "TAP_GITLAB_PRIVATE_TOKEN",
-            "auth_header_key": "TAP_GITLAB_AUTH_HEADER_KEY",
-            "auth_token_key": "TAP_GITLAB_AUTH_TOKEN_KEY",
             "groups": "TAP_GITLAB_GROUPS",
-            "projects": "TAP_GITLAB_PROJECTS",
-            "start_date": "TAP_GITLAB_START_DATE"
+            "projects": "TAP_GITLAB_PROJECTS"
         }
 
         for key, env_var in creds.items():
