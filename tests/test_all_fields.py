@@ -8,7 +8,8 @@ class AllFields(AllFieldsTest, BaseTest):
 
     MISSING_FIELDS = {
         "groups": {
-            "repository_storage"
+            "repository_storage",
+            "ip_restriction_ranges"
         },
         "issues": {
             'assignee_id',
@@ -28,6 +29,11 @@ class AllFields(AllFieldsTest, BaseTest):
             'owner',
             'repository_storage',
             'mirror_trigger_builds',
+            'ci_restrict_pipeline_cancellation_role',
+            'approvals_before_merge',
+            'mirror',
+            'allow_pipeline_trigger_approve_deployment',
+            'secret_push_protection_enabled',
         }
     }
 
