@@ -12,7 +12,7 @@ setup(
     classifiers=['Programming Language :: Python :: 3 :: Only'],
     install_requires=[
         'singer-python==6.1.1',
-        'requests==2.32.5',
+        'requests==2.33.0',
         'backoff==2.2.1'
     ],
     entry_points='''
