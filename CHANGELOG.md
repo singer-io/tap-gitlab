@@ -1,4 +1,8 @@
 # Changelog
+
+# 1.0.1
+  * Bump requests to 2.33.0 for security updates [#50](https://github.com/singer-io/tap-gitlab/pull/50)
+
 ## 1.0.0
   * Made new changes to add metadata fields and refactoring code. Removed `api_url` from required config field list. [#37](https://github.com/singer-io/tap-gitlab/pull/37)
   * Update to check api credentials before running discovery and support comma/space separated projects and groups list in config. Updated unset USE_STITCH_BACKEND in config.yaml due to Stitch backend need to be updated with current changes(remove api_url field). [#46](https://github.com/singer-io/tap-gitlab/pull/46)
