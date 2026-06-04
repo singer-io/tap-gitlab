@@ -105,34 +105,34 @@ class TestClientRequests(unittest.TestCase):
 class TestClientBaseUrl(unittest.TestCase):
 
     def test_default_base_url_uses_gitlab_cloud(self):
-        """When gitlab_url is absent the client targets gitlab.com."""
+        """When api_url is absent the client targets gitlab.com."""
         config = {"private_token": "dummy_token"}
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.com/api/v4")
 
-    def test_custom_gitlab_url_sets_base_url(self):
-        """When gitlab_url is set the client targets the on-prem instance."""
+    def test_custom_api_url_sets_base_url(self):
+        """When api_url is set the client targets the on-prem instance."""
         config = {
             "private_token": "dummy_token",
-            "gitlab_url": "https://gitlab.mycompany.com",
+            "api_url": "https://gitlab.mycompany.com",
         }
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
 
-    def test_trailing_slash_in_gitlab_url_is_stripped(self):
-        """Trailing slashes in gitlab_url must not produce a double-slash in base_url."""
+    def test_trailing_slash_in_api_url_is_stripped(self):
+        """Trailing slashes in api_url must not produce a double-slash in base_url."""
         config = {
             "private_token": "dummy_token",
-            "gitlab_url": "https://gitlab.mycompany.com/",
+            "api_url": "https://gitlab.mycompany.com/",
         }
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
 
-    def test_gitlab_url_without_scheme_defaults_to_https(self):
-        """A gitlab_url with no scheme (e.g. 'gitlab.mycompany.com') must get https:// prepended."""
+    def test_api_url_without_scheme_defaults_to_https(self):
+        """An api_url with no scheme (e.g. 'gitlab.mycompany.com') must get https:// prepended."""
         config = {
             "private_token": "dummy_token",
-            "gitlab_url": "gitlab.mycompany.com",
+            "api_url": "gitlab.mycompany.com",
         }
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
@@ -145,11 +145,11 @@ class TestCheckApiCredentials(unittest.TestCase):
         """A DNS/network failure in check_api_credentials raises a descriptive ConnectionError."""
         config = {
             "private_token": "dummy_token",
-            "gitlab_url": "https://test.gitlab.com",
+            "api_url": "https://test.gitlab.com",
         }
         client = Client(config)
         with self.assertRaises(ConnectionError) as ctx:
             client.check_api_credentials()
         self.assertIn("Unable to reach GitLab", str(ctx.exception))
         self.assertIn("test.gitlab.com", str(ctx.exception))
-        self.assertIn("gitlab_url", str(ctx.exception))
+        self.assertIn("api_url", str(ctx.exception))

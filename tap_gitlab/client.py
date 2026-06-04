@@ -77,10 +77,10 @@ class Client:
         self.config = config
         self._session = session()
 
-        gitlab_url = config.get("gitlab_url", "https://gitlab.com").rstrip("/")
-        if not urlparse(gitlab_url).scheme:
-            gitlab_url = f"https://{gitlab_url}"
-        self.base_url = f"{gitlab_url}/api/v4"
+        api_url = config.get("api_url", "https://gitlab.com").rstrip("/")
+        if not urlparse(api_url).scheme:
+            api_url = f"https://{api_url}"
+        self.base_url = f"{api_url}/api/v4"
 
         config_request_timeout = config.get("request_timeout")
         self.request_timeout = float(config_request_timeout) if config_request_timeout else REQUEST_TIMEOUT
@@ -106,10 +106,10 @@ class Client:
                 timeout=self.request_timeout
             )
         except ConnectionError as e:
-            gitlab_url = self.config.get("gitlab_url", "https://gitlab.com")
+            api_url = self.config.get("api_url", "https://gitlab.com")
             raise ConnectionError(
-                f"Unable to reach GitLab at '{gitlab_url}'. "
-                "Please verify that 'gitlab_url' in your config is correct and the host is reachable. "
+                f"Unable to reach GitLab at '{api_url}'. "
+                "Please verify that 'api_url' in your config is correct and the host is reachable. "
                 f"Original error: {e}"
             ) from e
 
