@@ -35,7 +35,7 @@ This tap:
 
     Create a JSON file called `config.json` containing:
     - Access token you just created
-    - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v3`
+    - *(Optional)* `gitlab_url` — the base URL of your GitLab instance. Defaults to `https://gitlab.com`. Set this when connecting to a **self-hosted / on-premises** GitLab server (e.g. `https://gitlab.mycompany.com`). The tap automatically appends `/api/v4` to whatever URL you provide.
     - Groups to track (space separated)
     - Projects to track (space separated)
 
@@ -48,9 +48,21 @@ This tap:
     - 'groups' contains space separated list of groups id.
     - 'projects' contains space separated list of projects id.
 
+    GitLab Cloud (default):
     ```json
     {
         "private_token": "your-access-token",
+        "groups": "myorg mygroup",
+        "projects": "myorg/repo-a myorg/repo-b",
+        "start_date": "2018-01-01T00:00:00Z"
+    }
+    ```
+
+    Self-hosted / on-premises GitLab:
+    ```json
+    {
+        "private_token": "your-access-token",
+        "gitlab_url": "https://gitlab.mycompany.com",
         "groups": "myorg mygroup",
         "projects": "myorg/repo-a myorg/repo-b",
         "start_date": "2018-01-01T00:00:00Z"

@@ -1,4 +1,5 @@
 from typing import Any, Dict, Mapping, Optional, Tuple
+from urllib.parse import urlparse
 
 import backoff
 import requests
@@ -75,7 +76,11 @@ class Client:
     def __init__(self, config: Mapping[str, Any]) -> None:
         self.config = config
         self._session = session()
-        self.base_url = "https://gitlab.com/api/v4"
+
+        gitlab_url = config.get("gitlab_url", "https://gitlab.com").rstrip("/")
+        if not urlparse(gitlab_url).scheme:
+            gitlab_url = f"https://{gitlab_url}"
+        self.base_url = f"{gitlab_url}/api/v4"
 
         config_request_timeout = config.get("request_timeout")
         self.request_timeout = float(config_request_timeout) if config_request_timeout else REQUEST_TIMEOUT
@@ -93,12 +98,21 @@ class Client:
         params = {'private_token': self.config.get("private_token")}
         endpoint = f"{self.base_url}/user"
 
-        response = self._session.get(
-            endpoint,
-            params=params,
-            headers=headers,
-            timeout=self.request_timeout
-        )
+        try:
+            response = self._session.get(
+                endpoint,
+                params=params,
+                headers=headers,
+                timeout=self.request_timeout
+            )
+        except ConnectionError as e:
+            gitlab_url = self.config.get("gitlab_url", "https://gitlab.com")
+            raise ConnectionError(
+                f"Unable to reach GitLab at '{gitlab_url}'. "
+                "Please verify that 'gitlab_url' in your config is correct and the host is reachable. "
+                f"Original error: {e}"
+            ) from e
+
         raise_for_error(response)
 
         user_data = response.json()

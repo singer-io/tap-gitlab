@@ -1,5 +1,9 @@
 # Changelog
 
+
+# 1.1.0
+  * Add optional `gitlab_url` config field to support on-premises GitLab instances; defaults to `https://gitlab.com`. [#51](https://github.com/singer-io/tap-gitlab/pull/51)
+
 # 1.0.1
   * Bump requests to 2.33.0 for security updates [#50](https://github.com/singer-io/tap-gitlab/pull/50)
 
