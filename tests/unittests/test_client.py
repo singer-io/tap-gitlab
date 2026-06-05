@@ -137,6 +137,24 @@ class TestClientBaseUrl(unittest.TestCase):
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
 
+    def test_api_url_with_port_and_no_scheme_gets_https(self):
+        """host:port without a scheme must not be mis-detected by urlparse and must get https://."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "gitlab.mycompany.com:8443",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com:8443/api/v4")
+
+    def test_api_url_with_existing_api_v4_suffix_is_not_doubled(self):
+        """Providing a full API base URL must not produce /api/v4/api/v4."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "https://gitlab.mycompany.com/api/v4",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
+
 
 class TestCheckApiCredentials(unittest.TestCase):
 

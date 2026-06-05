@@ -1,5 +1,5 @@
 from typing import Any, Dict, Mapping, Optional, Tuple
-from urllib.parse import urlparse
+import re
 
 import backoff
 import requests
@@ -78,8 +78,11 @@ class Client:
         self._session = session()
 
         api_url = config.get("api_url", "https://gitlab.com").rstrip("/")
-        if not urlparse(api_url).scheme:
+        if not api_url.startswith(("http://", "https://")):
             api_url = f"https://{api_url}"
+        # Strip any existing /api/vN suffix so both 'https://gitlab.com' and
+        # 'https://gitlab.com/api/v4' are accepted without producing a double suffix.
+        api_url = re.sub(r"/api/v\d+$", "", api_url)
         self.base_url = f"{api_url}/api/v4"
 
         config_request_timeout = config.get("request_timeout")

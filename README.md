@@ -35,7 +35,7 @@ This tap:
 
     Create a JSON file called `config.json` containing:
     - Access token you just created
-    - *(Optional)* `api_url` — the base URL of your GitLab instance. Defaults to `https://gitlab.com`. Set this when connecting to a **self-hosted / on-premises** GitLab server (e.g. `https://gitlab.mycompany.com`). The tap automatically appends `/api/v4` to whatever URL you provide.
+    - *(Optional)* `api_url` — the base URL of your GitLab instance, **without** the `/api/v4` path (e.g. `https://gitlab.mycompany.com`). Defaults to `https://gitlab.com`. Set this only when connecting to a **self-hosted / on-premises** GitLab server. The tap appends `/api/v4` automatically.
     - Groups to track (space separated)
     - Projects to track (space separated)
 
