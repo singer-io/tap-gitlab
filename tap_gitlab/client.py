@@ -77,7 +77,8 @@ class Client:
         self.config = config
         self._session = session()
 
-        api_url = config.get("api_url", "https://gitlab.com").rstrip("/")
+        api_url = (config.get("api_url") or "").strip() or "https://gitlab.com"
+        api_url = api_url.rstrip("/")
         if not api_url.startswith(("http://", "https://")):
             api_url = f"https://{api_url}"
         # Strip any existing /api/vN suffix so both 'https://gitlab.com' and
@@ -109,11 +110,10 @@ class Client:
                 timeout=self.request_timeout
             )
         except ConnectionError as e:
-            api_url = self.config.get("api_url", "https://gitlab.com")
             raise ConnectionError(
-                f"Unable to reach GitLab at '{api_url}'. "
+                f"Unable to reach GitLab at '{self.base_url}'. "
                 "Please verify that 'api_url' in your config is correct and the host is reachable. "
-                f"Original error: {e}"
+                f"({type(e).__name__})"
             ) from e
 
         raise_for_error(response)

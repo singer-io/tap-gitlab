@@ -110,6 +110,14 @@ class TestClientBaseUrl(unittest.TestCase):
         client = Client(config)
         self.assertEqual(client.base_url, "https://gitlab.com/api/v4")
 
+    def test_empty_api_url_falls_back_to_gitlab_cloud(self):
+        """An empty or whitespace-only api_url must fall back to gitlab.com."""
+        for value in ["", "   ", None]:
+            with self.subTest(api_url=value):
+                config = {"private_token": "dummy_token", "api_url": value}
+                client = Client(config)
+                self.assertEqual(client.base_url, "https://gitlab.com/api/v4")
+
     def test_custom_api_url_sets_base_url(self):
         """When api_url is set the client targets the on-prem instance."""
         config = {
@@ -160,7 +168,8 @@ class TestCheckApiCredentials(unittest.TestCase):
 
     @patch("requests.Session.get", side_effect=ConnectionError("Failed to resolve 'test.gitlab.com'"))
     def test_unreachable_host_raises_friendly_connection_error(self, mock_get):
-        """A DNS/network failure in check_api_credentials raises a descriptive ConnectionError."""
+        """A DNS/network failure in check_api_credentials raises a descriptive ConnectionError
+        that does not leak the raw urllib3 message (which may contain the private_token URL)."""
         config = {
             "private_token": "dummy_token",
             "api_url": "https://test.gitlab.com",
@@ -168,6 +177,11 @@ class TestCheckApiCredentials(unittest.TestCase):
         client = Client(config)
         with self.assertRaises(ConnectionError) as ctx:
             client.check_api_credentials()
-        self.assertIn("Unable to reach GitLab", str(ctx.exception))
-        self.assertIn("test.gitlab.com", str(ctx.exception))
-        self.assertIn("api_url", str(ctx.exception))
+        msg = str(ctx.exception)
+        self.assertIn("Unable to reach GitLab", msg)
+        # base_url (no token) is shown, not the raw original error
+        self.assertIn("test.gitlab.com", msg)
+        self.assertIn("api_url", msg)
+        # Raw urllib3 message must not be included to avoid token leakage
+        self.assertNotIn("Failed to resolve", msg)
+        self.assertNotIn("private_token", msg)
