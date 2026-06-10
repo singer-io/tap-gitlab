@@ -1,4 +1,5 @@
 from typing import Any, Dict, Mapping, Optional, Tuple
+import re
 
 import backoff
 import requests
@@ -75,7 +76,15 @@ class Client:
     def __init__(self, config: Mapping[str, Any]) -> None:
         self.config = config
         self._session = session()
-        self.base_url = "https://gitlab.com/api/v4"
+
+        api_url = (config.get("api_url") or "").strip() or "https://gitlab.com"
+        api_url = api_url.rstrip("/")
+        if not api_url.startswith(("http://", "https://")):
+            api_url = f"https://{api_url}"
+        # Strip any existing /api/vN suffix so both 'https://gitlab.com' and
+        # 'https://gitlab.com/api/v4' are accepted without producing a double suffix.
+        api_url = re.sub(r"/api/v\d+$", "", api_url)
+        self.base_url = f"{api_url}/api/v4"
 
         config_request_timeout = config.get("request_timeout")
         self.request_timeout = float(config_request_timeout) if config_request_timeout else REQUEST_TIMEOUT
@@ -93,12 +102,20 @@ class Client:
         params = {'private_token': self.config.get("private_token")}
         endpoint = f"{self.base_url}/user"
 
-        response = self._session.get(
-            endpoint,
-            params=params,
-            headers=headers,
-            timeout=self.request_timeout
-        )
+        try:
+            response = self._session.get(
+                endpoint,
+                params=params,
+                headers=headers,
+                timeout=self.request_timeout
+            )
+        except ConnectionError as e:
+            raise ConnectionError(
+                f"Unable to reach GitLab at '{self.base_url}'. "
+                "Please verify that 'api_url' in your config is correct and the host is reachable. "
+                f"({type(e).__name__})"
+            ) from e
+
         raise_for_error(response)
 
         user_data = response.json()

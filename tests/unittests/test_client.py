@@ -100,3 +100,88 @@ class TestClientRequests(unittest.TestCase):
         with self.assertRaises(Error):
             with Client(config) as client:
                 client.get(endpoint="dummy", params={}, headers={})
+
+
+class TestClientBaseUrl(unittest.TestCase):
+
+    def test_default_base_url_uses_gitlab_cloud(self):
+        """When api_url is absent the client targets gitlab.com."""
+        config = {"private_token": "dummy_token"}
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.com/api/v4")
+
+    def test_empty_api_url_falls_back_to_gitlab_cloud(self):
+        """An empty or whitespace-only api_url must fall back to gitlab.com."""
+        for value in ["", "   ", None]:
+            with self.subTest(api_url=value):
+                config = {"private_token": "dummy_token", "api_url": value}
+                client = Client(config)
+                self.assertEqual(client.base_url, "https://gitlab.com/api/v4")
+
+    def test_custom_api_url_sets_base_url(self):
+        """When api_url is set the client targets the on-prem instance."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "https://gitlab.mycompany.com",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
+
+    def test_trailing_slash_in_api_url_is_stripped(self):
+        """Trailing slashes in api_url must not produce a double-slash in base_url."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "https://gitlab.mycompany.com/",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
+
+    def test_api_url_without_scheme_defaults_to_https(self):
+        """An api_url with no scheme (e.g. 'gitlab.mycompany.com') must get https:// prepended."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "gitlab.mycompany.com",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
+
+    def test_api_url_with_port_and_no_scheme_gets_https(self):
+        """host:port without a scheme must not be mis-detected by urlparse and must get https://."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "gitlab.mycompany.com:8443",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com:8443/api/v4")
+
+    def test_api_url_with_existing_api_v4_suffix_is_not_doubled(self):
+        """Providing a full API base URL must not produce /api/v4/api/v4."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "https://gitlab.mycompany.com/api/v4",
+        }
+        client = Client(config)
+        self.assertEqual(client.base_url, "https://gitlab.mycompany.com/api/v4")
+
+
+class TestCheckApiCredentials(unittest.TestCase):
+
+    @patch("requests.Session.get", side_effect=ConnectionError("Failed to resolve 'test.gitlab.com'"))
+    def test_unreachable_host_raises_friendly_connection_error(self, mock_get):
+        """A DNS/network failure in check_api_credentials raises a descriptive ConnectionError
+        that does not leak the raw urllib3 message (which may contain the private_token URL)."""
+        config = {
+            "private_token": "dummy_token",
+            "api_url": "https://test.gitlab.com",
+        }
+        client = Client(config)
+        with self.assertRaises(ConnectionError) as ctx:
+            client.check_api_credentials()
+        msg = str(ctx.exception)
+        self.assertIn("Unable to reach GitLab", msg)
+        # base_url (no token) is shown, not the raw original error
+        self.assertIn("test.gitlab.com", msg)
+        self.assertIn("api_url", msg)
+        # Raw urllib3 message must not be included to avoid token leakage
+        self.assertNotIn("Failed to resolve", msg)
+        self.assertNotIn("private_token", msg)
