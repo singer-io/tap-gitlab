@@ -2,8 +2,7 @@
 
 
 # 1.2.0
-  * Streams the credentials cannot access (403) are now excluded from the catalog during discovery instead of raising an error.[#52](https://github.com/singer-io/tap-gitlab/pull/52)
-
+  * Streams returning 403 Forbidden during discovery are now excluded from the catalog; discovery fails only if none are accessible. [#52](https://github.com/singer-io/tap-gitlab/pull/52)
 # 1.1.0
   * Add optional `api_url` config field to support on-premises GitLab instances; defaults to `https://gitlab.com`. [#51](https://github.com/singer-io/tap-gitlab/pull/51)
   * Bump singer-python to 6.8.0 and requests to 2.34.2.
