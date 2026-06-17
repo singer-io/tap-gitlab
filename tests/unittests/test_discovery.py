@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch, MagicMock
 from tap_gitlab.discover import discover, _apply_access_checks, _prune_inaccessible_children
 from tap_gitlab.exceptions import ForbiddenError
-from tap_gitlab.streams import STREAMS
 
 
 class TestAccessChecks(unittest.TestCase):
