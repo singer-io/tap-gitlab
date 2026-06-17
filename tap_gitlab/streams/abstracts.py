@@ -13,6 +13,8 @@ from singer import (
 from dateutil import parser
 from datetime import datetime, timezone
 
+from tap_gitlab.exceptions import ForbiddenError
+
 LOGGER = get_logger()
 
 
@@ -31,8 +33,8 @@ class BaseStream(ABC):
     def __init__(self, client=None, catalog=None) -> None:
         self.client = client
         self.catalog = catalog
-        self.schema = self.catalog.schema.to_dict() if self.catalog else None
-        self.metadata = metadata.to_map(self.catalog.metadata) if self.catalog else None
+        self.schema = self.catalog.schema.to_dict() if self.catalog else {}
+        self.metadata = metadata.to_map(self.catalog.metadata) if self.catalog else {}
         self.child_to_sync = []
         self.params = {}
 
@@ -115,6 +117,29 @@ class BaseStream(ABC):
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         return self.url_endpoint or f"{self.client.base_url}/{self.path}"
+
+    def check_access(self) -> bool:
+        """
+        Verify that the API credentials have read access to this stream.
+        Returns True if accessible, False if a 403 Forbidden error is raised.
+        Child streams always return True (access is governed by the parent check).
+        """
+        if self.parent:
+            return True
+
+        url = self.get_url_endpoint()
+        params = {"per_page": 1}
+
+        try:
+            self.client.get(url, params, self.headers, None)
+            return True
+        except ForbiddenError as exc:
+            LOGGER.warning(
+                "Unauthorized Stream: %s, excluding from catalog. HTTP-Error-Message:'%s'",
+                self.tap_stream_id,
+                str(exc),
+            )
+            return False
 
 
 class IncrementalStream(BaseStream):
