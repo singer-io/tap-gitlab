@@ -77,6 +77,62 @@ class TestAccessChecks(unittest.TestCase):
         with self.assertRaises(ForbiddenError):
             _apply_access_checks(mock_client, schemas, field_metadata)
 
+    @patch("tap_gitlab.discover._prune_inaccessible_children")
+    @patch("tap_gitlab.discover.STREAMS")
+    def test_no_streams_accessible_raises_with_message(self, mock_streams, mock_prune):
+        """All streams inaccessible - ForbiddenError has correct message."""
+        mock_client = MagicMock()
+
+        forbidden_instance = MagicMock()
+        forbidden_instance.check_access.return_value = False
+        forbidden_cls = MagicMock(return_value=forbidden_instance)
+
+        mock_streams.items.return_value = [
+            ("projects", forbidden_cls),
+            ("groups", forbidden_cls),
+        ]
+
+        schemas = {"projects": {"properties": {}}, "groups": {"properties": {}}}
+        field_metadata = {"projects": [], "groups": []}
+
+        with self.assertRaises(ForbiddenError) as context:
+            _apply_access_checks(mock_client, schemas, field_metadata)
+
+        self.assertIn(
+            "No streams are accessible. Ensure the credentials have read permission for at least one stream.",
+            str(context.exception),
+        )
+
+    @patch("tap_gitlab.discover.LOGGER")
+    @patch("tap_gitlab.discover._prune_inaccessible_children")
+    @patch("tap_gitlab.discover.STREAMS")
+    def test_partial_access_logs_warning(self, mock_streams, mock_prune, mock_logger):
+        """Some streams inaccessible - logs warning listing excluded streams."""
+        mock_client = MagicMock()
+
+        accessible_instance = MagicMock()
+        accessible_instance.check_access.return_value = True
+        accessible_cls = MagicMock(return_value=accessible_instance)
+
+        forbidden_instance = MagicMock()
+        forbidden_instance.check_access.return_value = False
+        forbidden_cls = MagicMock(return_value=forbidden_instance)
+
+        mock_streams.items.return_value = [
+            ("projects", accessible_cls),
+            ("groups", forbidden_cls),
+        ]
+
+        schemas = {"projects": {"properties": {}}, "groups": {"properties": {}}}
+        field_metadata = {"projects": [], "groups": []}
+
+        _apply_access_checks(mock_client, schemas, field_metadata)
+
+        mock_logger.warning.assert_called_with(
+            "These streams have been excluded due to HTTP-Error-Code:403 Forbidden: %s",
+            "groups",
+        )
+
     def test_prune_inaccessible_children(self):
         """Child streams are removed when parent is excluded."""
         schemas = {
@@ -142,6 +198,25 @@ class TestCheckAccessMethod(unittest.TestCase):
         result = stream.check_access()
 
         self.assertFalse(result)
+
+    def test_parent_stream_forbidden_logs_warning(self):
+        """Parent stream logs warning with stream name and error message on 403."""
+        from tap_gitlab.streams.groups import Groups
+
+        mock_client = MagicMock()
+        mock_client.base_url = "https://gitlab.com/api/v4"
+        mock_client.get.side_effect = ForbiddenError("403 Access Denied")
+        stream = Groups(client=mock_client)
+
+        with patch("tap_gitlab.streams.abstracts.LOGGER") as mock_logger:
+            result = stream.check_access()
+
+            self.assertFalse(result)
+            mock_logger.warning.assert_called_once_with(
+                "Unauthorized Stream: %s, excluding from catalog. HTTP-Error-Message:'%s'",
+                stream.tap_stream_id,
+                "403 Access Denied",
+            )
 
 
 class TestDiscoverWithClient(unittest.TestCase):
