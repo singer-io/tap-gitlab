@@ -58,8 +58,16 @@ def raise_for_error(response: requests.Response) -> None:
     if response.status_code not in [200, 201, 204]:
         if response_json.get("error"):
             message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('error')}"
+            if response_json.get("error_description"):
+                message += f" - {response_json.get('error_description')}"
+        elif response_json.get("message"):
+            message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('message')}"
         else:
-            message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('message', ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get('message', 'Unknown Error'))}"
+            fallback = ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get('message', 'Unknown Error')
+            raw_body = getattr(response, 'text', None)
+            message = f"HTTP-error-code: {response.status_code}, Error: {fallback}"
+            if raw_body:
+                message += f" (Response body: {raw_body[:200]})"
         exc = ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get("raise_exception", Error)
         raise exc(message, response) from None
 

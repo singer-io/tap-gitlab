@@ -2,6 +2,7 @@
 
 # 1.1.1
  * Moves private token from the params to the header "PRIVATE-TOKEN" [#54](https://github.com/singer-io/tap-gitlab/pull/54)
+ * Improved error parsing to surface the actual GitLab error message when available.
 
 # 1.1.0
   * Add optional `api_url` config field to support on-premises GitLab instances; defaults to `https://gitlab.com`. [#51](https://github.com/singer-io/tap-gitlab/pull/51)
