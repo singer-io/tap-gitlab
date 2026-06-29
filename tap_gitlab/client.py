@@ -98,8 +98,7 @@ class Client:
 
     def check_api_credentials(self) -> None:
         """Verify API credentials by making a test request."""
-        headers = {}
-        params = {'private_token': self.config.get("private_token")}
+        headers, params = self.authenticate({}, {})
         endpoint = f"{self.base_url}/user"
 
         try:
@@ -124,7 +123,9 @@ class Client:
     def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
         """Authenticates the request using dynamic header/token keys."""
         params = params or {}
-        params['private_token'] = self.config.get("private_token")
+        private_token = self.config.get("private_token")
+        if private_token:
+            headers["PRIVATE-TOKEN"] = private_token
 
         if isinstance(headers, dict) and "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
