@@ -67,6 +67,7 @@ def raise_for_error(response: requests.Response) -> None:
             raw_body = getattr(response, 'text', None)
             message = f"HTTP-error-code: {response.status_code}, Error: {fallback}"
             if raw_body:
+                # Truncated error logs to 200 chars to avoid flooding logs with large HTML error pages
                 message += f" (Response body: {raw_body[:200]})"
         exc = ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get("raise_exception", Error)
         raise exc(message, response) from None
