@@ -55,6 +55,7 @@ class Groups(FullTableStream):
         for group_id in group_ids:
             try:
                 self._current_group_id = group_id
+                LOGGER.info(f"Syncing group: {group_id}")
                 endpoint = self.get_url_endpoint()
                 response = self.client.get(endpoint, self.params, self.headers, None)
 
