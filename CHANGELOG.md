@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.1.2
+  * `projects` now independently fetches, merges, and deduplicates project IDs from configured groups. [#55](https://github.com/singer-io/tap-gitlab/pull/55)
+
 # 1.1.1
  * Moved the private token from query parameters to the `PRIVATE-TOKEN` request header for improved security. [#54](https://github.com/singer-io/tap-gitlab/pull/54)
  * Enhanced error handling to extract and display the underlying GitLab API error message when present.

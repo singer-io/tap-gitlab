@@ -15,16 +15,52 @@ class Projects(IncrementalStream):
     data_key = None
     children = ["branches", "issues", "commits", "project_milestones", "users"]
 
+    def get_group_project_ids(self) -> set:
+        """Fetch project IDs from all groups configured in config, regardless of whether groups stream is selected."""
+        groups_str = self.client.config.get("groups", "")
+        if not groups_str or not groups_str.strip():
+            return set()
+
+        group_ids = groups_str.strip().replace(",", " ").split()
+        LOGGER.info(f"Fetching projects from {len(group_ids)} configured group(s)")
+
+        project_ids = set()
+        for group_id in group_ids:
+            encoded_id = quote(str(group_id), safe='')
+            endpoint = f"{self.client.base_url}/groups/{encoded_id}/projects"
+            page = 1
+            while True:
+                params = {"per_page": self.page_size, "page": page}
+                response = self.client.get(endpoint, params, self.headers, None)
+                if not isinstance(response, list) or not response:
+                    break
+                for project in response:
+                    if isinstance(project, dict) and 'id' in project:
+                        project_ids.add(str(project['id']))
+                if len(response) < self.page_size:
+                    break
+                page += 1
+
+        LOGGER.info(f"Found {len(project_ids)} project ID(s) from configured groups")
+        return project_ids
+
     def get_project_ids(self) -> list:
-        """Parse comma and/or space-separated project IDs from config."""
-        projects_str = self.client.config.get("projects", "")
-        if not projects_str:
-            LOGGER.warning("No projects specified in config")
+        """Get all project IDs: from config + from all configured groups."""
+        config_str = self.client.config.get("projects", "")
+        config_ids = set(config_str.strip().replace(",", " ").split()) if config_str.strip() else set()
+
+        group_ids = self.get_group_project_ids()
+
+        all_ids = config_ids | group_ids
+        if not all_ids:
+            LOGGER.warning("No project IDs found from config or groups")
             return []
 
-        project_ids = projects_str.strip().replace(",", " ").split()
-        LOGGER.info(f"Found {len(project_ids)} project IDs: {project_ids}")
-        return project_ids
+        LOGGER.info(
+            f"Total project IDs to sync: {len(all_ids)} "
+            f"(config: {len(config_ids)}, groups: {len(group_ids)})"
+        )
+        return sorted(all_ids)
 
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         """Build endpoint URL for a specific project ID."""
@@ -33,27 +69,14 @@ class Projects(IncrementalStream):
             return f"{self.client.base_url}/projects/{encoded_id}"
         return f"{self.client.base_url}/projects"
 
-    def sync(self, state: Dict, transformer: Any, parent_obj: Dict = None, project_ids_list: list = None) -> int:
-        """Override sync to handle both config project IDs and group projects."""
-        if project_ids_list:
-            # Called with explicit project IDs list (e.g., from groups)
-            self._project_ids_override = project_ids_list
-            result = super().sync(state=state, transformer=transformer, parent_obj=None)
-            delattr(self, '_project_ids_override')
-            return result
-
-        # Called independently - sync projects from config
-        LOGGER.info("Syncing projects from config project IDs")
+    def sync(self, state: Dict, transformer: Any, parent_obj: Dict = None) -> int:
+        """Sync all projects from config IDs and configured groups."""
+        LOGGER.info("Syncing projects from config and configured groups")
         return super().sync(state=state, transformer=transformer, parent_obj=None)
 
     def get_records(self) -> Iterator:
-        """Override to fetch records for each project ID from config."""
-        # Use override list if provided, otherwise get from config
-        if hasattr(self, '_project_ids_override'):
-            project_ids = self._project_ids_override
-            LOGGER.info(f"Using overridden project IDs list with {project_ids} projects")
-        else:
-            project_ids = self.get_project_ids()
+        """Fetch records for each resolved project ID."""
+        project_ids = self.get_project_ids()
 
         for project_id in project_ids:
             self._current_project_id = project_id
