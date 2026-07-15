@@ -232,3 +232,80 @@ class TestGroupsStreamIndependence(unittest.TestCase):
         record = {"id": 100, "projects": [{"id": 1}, {"id": 2}]}
         stream.modify_object(record)
         self.assertFalse(hasattr(stream, "_collected_project_ids"))
+
+
+class TestBranchesStream(unittest.TestCase):
+    """Tests for Branches stream — now ChildBaseStream with updated_at from parent."""
+
+    def _make_stream(self):
+        from tap_gitlab.streams.branches import Branches
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        client = make_mock_client({})
+        catalog_entry = make_mock_catalog_entry()
+        return Branches(client=client, catalog=catalog_entry)
+
+    def test_branches_is_child_base_stream(self):
+        from tap_gitlab.streams.branches import Branches
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        self.assertTrue(issubclass(Branches, ChildBaseStream))
+
+    def test_branches_replication_method_is_incremental(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_method, "INCREMENTAL")
+
+    def test_branches_replication_key_is_updated_at(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_keys, ["updated_at"])
+
+    def test_modify_object_sets_project_id_and_updated_at_from_parent(self):
+        stream = self._make_stream()
+        parent = {"id": 42, "updated_at": "2026-03-01T10:00:00Z"}
+        record = {"name": "main", "merged": False}
+        result = stream.modify_object(record, parent)
+        self.assertEqual(result["project_id"], 42)
+        self.assertEqual(result["updated_at"], "2026-03-01T10:00:00Z")
+
+    def test_modify_object_no_parent_returns_record_unchanged(self):
+        stream = self._make_stream()
+        record = {"name": "main"}
+        result = stream.modify_object(record, None)
+        self.assertNotIn("project_id", result)
+        self.assertNotIn("updated_at", result)
+
+
+class TestUsersStream(unittest.TestCase):
+    """Tests for Users stream — now ChildBaseStream with updated_at from parent."""
+
+    def _make_stream(self):
+        from tap_gitlab.streams.users import Users
+        client = make_mock_client({})
+        catalog_entry = make_mock_catalog_entry()
+        return Users(client=client, catalog=catalog_entry)
+
+    def test_users_is_child_base_stream(self):
+        from tap_gitlab.streams.users import Users
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        self.assertTrue(issubclass(Users, ChildBaseStream))
+
+    def test_users_replication_method_is_incremental(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_method, "INCREMENTAL")
+
+    def test_users_replication_key_is_updated_at(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_keys, ["updated_at"])
+
+    def test_modify_object_sets_project_id_and_updated_at_from_parent(self):
+        stream = self._make_stream()
+        parent = {"id": 99, "updated_at": "2026-06-15T08:00:00Z"}
+        record = {"id": 1, "username": "alice"}
+        result = stream.modify_object(record, parent)
+        self.assertEqual(result["project_id"], 99)
+        self.assertEqual(result["updated_at"], "2026-06-15T08:00:00Z")
+
+    def test_modify_object_no_parent_returns_record_unchanged(self):
+        stream = self._make_stream()
+        record = {"id": 1, "username": "alice"}
+        result = stream.modify_object(record, None)
+        self.assertNotIn("project_id", result)
+        self.assertNotIn("updated_at", result)
