@@ -40,20 +40,20 @@ This tap:
     - Projects to track (space separated)
 
     Notes:
-    - either groups or projects need to be provided
-    - filling in 'groups' but leaving 'projects' empty will sync all group projects.
-    - filling in 'projects' but leaving 'groups' empty will sync selected projects.
-    - filling in 'groups' and 'groups' will sync selected projects of those groups.
-    - filling in 'projects' and 'groups' both will sync all selected projects and all group projects.
-    - 'groups' contains space separated list of groups id.
-    - 'projects' contains space separated list of projects id.
+    - either `groups` or `projects` must be provided.
+    - `groups` only — the tap fetches all projects belonging to those groups and syncs them along with their child streams (branches, commits, issues, etc.).
+    - `projects` only — the tap syncs the explicitly listed projects and their child streams.
+    - `groups` and `projects` both — the tap merges projects from both sources (deduplicating any overlap) and syncs all of them. The `projects` stream independently queries the groups API; it does not depend on the `groups` stream being selected.
+    - The `groups` stream and its child `group_milestones` are independent of the `projects` tree and can be selected or deselected without affecting project data sync.
+    - `groups` accepts a space or comma-separated list of group IDs.
+    - `projects` accepts a space or comma-separated list of project IDs.
 
     GitLab Cloud (default):
     ```json
     {
         "private_token": "your-access-token",
         "groups": "myorg mygroup",
-        "projects": "myorg/repo-a myorg/repo-b",
+        "projects": "project_id1 project_id2",
         "start_date": "2018-01-01T00:00:00Z"
     }
     ```
