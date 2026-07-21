@@ -8,7 +8,7 @@ class Users(ChildBaseStream):
     key_properties = ["id", "project_id"]
     replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = ["updated_at"]
+    replication_keys = ["projects_updated_at"]
     path = "projects/{}/users"
     data_key = None
 
@@ -30,9 +30,8 @@ class Users(ChildBaseStream):
         return endpoint
 
     def modify_object(self, record, parent_record=None):
-        """Add project_id and parent project's updated_at (used as replication key) to each record."""
+        """Add project_id and parent project's updated_at to each user record."""
         if isinstance(record, dict) and parent_record and isinstance(parent_record, dict):
             record["project_id"] = parent_record.get("id")
-            record["updated_at"] = parent_record.get("updated_at")
-
+            record["projects_updated_at"] = parent_record.get("updated_at")
         return record

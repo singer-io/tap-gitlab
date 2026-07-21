@@ -2,11 +2,11 @@ from typing import Dict, Any, Iterator
 from singer import get_logger
 from urllib.parse import quote
 
-from tap_gitlab.streams.abstracts import IncrementalStream
+from tap_gitlab.streams.abstracts import ParentBaseStream
 
 LOGGER = get_logger()
 
-class Projects(IncrementalStream):
+class Projects(ParentBaseStream):
     tap_stream_id = "projects"
     key_properties = ["id"]
     replication_method = "INCREMENTAL"

@@ -8,14 +8,14 @@ class Branches(ChildBaseStream):
     key_properties = ["project_id", "name"]
     replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = ["updated_at"]
+    replication_keys = ["projects_updated_at"]
     path = "projects/{}/repository/branches"
     data_key = None
 
     def get_url(self, parent_obj: Dict[str, Any]) -> str:
-        """Construct the URL for fetching users of a specific project."""
+        """Construct the URL for fetching branches of a specific project."""
         if not parent_obj:
-            raise ValueError("parent_obj is required but got None in users.get_url()")
+            raise ValueError("parent_obj is required but got None in branches.get_url()")
 
         project_identifier = parent_obj.get("id")
         if not project_identifier:
@@ -30,9 +30,8 @@ class Branches(ChildBaseStream):
         return endpoint
 
     def modify_object(self, record, parent_record=None):
-        """Add project_id and parent project's updated_at (used as replication key) to each record."""
+        """Add project_id and parent project's updated_at to each branch record."""
         if isinstance(record, dict) and parent_record and isinstance(parent_record, dict):
             record["project_id"] = parent_record.get("id")
-            record["updated_at"] = parent_record.get("updated_at")
-
+            record["projects_updated_at"] = parent_record.get("updated_at")
         return record

@@ -215,6 +215,39 @@ class IncrementalStream(BaseStream):
             )
             return counter.value
 
+class ParentBaseStream(IncrementalStream):
+    """Base class for streams that own the bookmark of their child streams.
+    """
+
+    def get_bookmark(self, state: dict, stream: str, key: Any = None):
+        """Return min(parent_bookmark, child_1_bookmark, …).
+        """
+        min_bookmark = super().get_bookmark(state, stream) if self.is_selected() else None
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+
+        for child in self.child_to_sync:
+            child_bookmark = super().get_bookmark(
+                state, child.tap_stream_id, key=bookmark_key
+            )
+            min_bookmark = min(min_bookmark, child_bookmark) if min_bookmark else child_bookmark
+
+        return min_bookmark or self.client.config["start_date"]
+
+    def update_bookmark_state(self, state: dict, stream: str, key: Any = None, value: Any = None) -> Dict:
+        """Advance parent bookmark and write the same value to all child streams.
+        """
+        if self.is_selected():
+            super().update_bookmark_state(state, stream, key=key, value=value)
+
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+        for child in self.child_to_sync:
+            super().update_bookmark_state(
+                state, child.tap_stream_id, key=bookmark_key, value=value
+            )
+
+        return state
+
+
 class FullTableStream(BaseStream):
     """Base Class for FullTable Stream."""
 

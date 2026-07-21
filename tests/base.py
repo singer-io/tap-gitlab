@@ -43,7 +43,7 @@ class BaseTest(BaseCase):
             "branches": {
                 cls.PRIMARY_KEYS: {"project_id", "name"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: {"updated_at"},
+                cls.REPLICATION_KEYS: {"projects_updated_at"},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 5
             },
@@ -78,7 +78,7 @@ class BaseTest(BaseCase):
             "users": {
                 cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
-                cls.REPLICATION_KEYS: {'updated_at'},
+                cls.REPLICATION_KEYS: {'projects_updated_at'},
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 3
             },
