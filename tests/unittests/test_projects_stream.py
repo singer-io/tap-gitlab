@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock
 
 
 def make_mock_client(config):
@@ -55,7 +55,7 @@ class TestGetGroupProjectIds(unittest.TestCase):
         self.assertEqual(result, {"10", "20"})
         stream.client.get.assert_called_once_with(
             "https://gitlab.com/api/v4/groups/100/projects",
-            {"per_page": 100, "page": 1},
+            {"per_page": stream.page_size, "page": 1},
             stream.headers,
             None
         )

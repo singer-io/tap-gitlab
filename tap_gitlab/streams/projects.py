@@ -32,7 +32,13 @@ class Projects(IncrementalStream):
             while True:
                 params = {"per_page": self.page_size, "page": page}
                 response = self.client.get(endpoint, params, self.headers, None)
-                if not isinstance(response, list) or not response:
+                if not isinstance(response, list):
+                    LOGGER.warning(
+                        f"Unexpected response for group '{group_id}' page {page}: "
+                        f"got {type(response).__name__}, expected list. Skipping remaining pages."
+                    )
+                    break
+                if not response:
                     break
                 for project in response:
                     if isinstance(project, dict) and 'id' in project:
