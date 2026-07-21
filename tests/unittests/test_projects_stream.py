@@ -203,8 +203,70 @@ class TestGetRecords(unittest.TestCase):
         self.assertEqual(called_endpoint, "https://gitlab.com/api/v4/projects/10")
 
 
+class TestProjectsParentBookmark(unittest.TestCase):
+    """Tests for ParentBaseStream bookmark behaviour on Projects."""
+
+    def _make_projects_with_children(self, config=None):
+        from tap_gitlab.streams.projects import Projects
+        from tap_gitlab.streams.branches import Branches
+        from tap_gitlab.streams.users import Users
+
+        if config is None:
+            config = {"start_date": "2026-01-01T00:00:00Z", "projects": "10"}
+        client = make_mock_client(config)
+        stream = Projects(client=client, catalog=make_mock_catalog_entry())
+        branches = Branches(client=client, catalog=make_mock_catalog_entry())
+        users = Users(client=client, catalog=make_mock_catalog_entry())
+        stream.child_to_sync = [branches, users]
+        return stream, branches, users
+
+    def test_projects_extends_parent_base_stream(self):
+        from tap_gitlab.streams.projects import Projects
+        from tap_gitlab.streams.abstracts import ParentBaseStream
+        self.assertTrue(issubclass(Projects, ParentBaseStream))
+
+    def test_get_bookmark_returns_min_across_parent_and_children(self):
+        """When children have an older bookmark, parent must re-process from children's date."""
+        state = {
+            "bookmarks": {
+                "projects": {"updated_at": "2026-06-01T00:00:00Z"},
+                "branches": {"projects_updated_at": "2026-03-01T00:00:00Z"},
+                "users":    {"projects_updated_at": "2026-05-01T00:00:00Z"},
+            }
+        }
+        stream, _, _ = self._make_projects_with_children()
+        bookmark = stream.get_bookmark(state, "projects")
+        self.assertEqual(bookmark, "2026-03-01T00:00:00Z")
+
+    def test_get_bookmark_falls_back_to_start_date_when_no_state(self):
+        stream, _, _ = self._make_projects_with_children()
+        bookmark = stream.get_bookmark({}, "projects")
+        self.assertEqual(bookmark, "2026-01-01T00:00:00Z")
+
+    def test_update_bookmark_state_writes_children_under_projects_updated_at(self):
+        """Children's bookmarks must be stored under 'projects_updated_at'."""
+        state = {}
+        stream, _, _ = self._make_projects_with_children()
+        stream.update_bookmark_state(state, "projects", value="2026-07-01T00:00:00Z")
+        self.assertEqual(
+            state["bookmarks"]["branches"]["projects_updated_at"], "2026-07-01T00:00:00Z"
+        )
+        self.assertEqual(
+            state["bookmarks"]["users"]["projects_updated_at"], "2026-07-01T00:00:00Z"
+        )
+
+    def test_update_bookmark_state_writes_parent_when_selected(self):
+        from unittest.mock import patch
+        state = {}
+        stream, _, _ = self._make_projects_with_children()
+        with patch.object(stream, "is_selected", return_value=True):
+            stream.update_bookmark_state(state, "projects", value="2026-07-01T00:00:00Z")
+        self.assertEqual(
+            state["bookmarks"]["projects"]["updated_at"], "2026-07-01T00:00:00Z"
+        )
+
+
 class TestGroupsStreamIndependence(unittest.TestCase):
-    """Verify Groups stream no longer has project-syncing logic."""
 
     def test_groups_sync_does_not_call_projects(self):
         from tap_gitlab.streams.groups import Groups
@@ -232,3 +294,80 @@ class TestGroupsStreamIndependence(unittest.TestCase):
         record = {"id": 100, "projects": [{"id": 1}, {"id": 2}]}
         stream.modify_object(record)
         self.assertFalse(hasattr(stream, "_collected_project_ids"))
+
+
+class TestBranchesStream(unittest.TestCase):
+    """Tests for Branches stream — now ChildBaseStream with updated_at from parent."""
+
+    def _make_stream(self):
+        from tap_gitlab.streams.branches import Branches
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        client = make_mock_client({})
+        catalog_entry = make_mock_catalog_entry()
+        return Branches(client=client, catalog=catalog_entry)
+
+    def test_branches_is_child_base_stream(self):
+        from tap_gitlab.streams.branches import Branches
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        self.assertTrue(issubclass(Branches, ChildBaseStream))
+
+    def test_branches_replication_method_is_incremental(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_method, "INCREMENTAL")
+
+    def test_branches_replication_key_is_projects_updated_at(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_keys, ["projects_updated_at"])
+
+    def test_modify_object_sets_project_id_and_projects_updated_at_from_parent(self):
+        stream = self._make_stream()
+        parent = {"id": 42, "updated_at": "2026-03-01T10:00:00Z"}
+        record = {"name": "main", "merged": False}
+        result = stream.modify_object(record, parent)
+        self.assertEqual(result["project_id"], 42)
+        self.assertEqual(result["projects_updated_at"], "2026-03-01T10:00:00Z")
+
+    def test_modify_object_no_parent_returns_record_unchanged(self):
+        stream = self._make_stream()
+        record = {"name": "main"}
+        result = stream.modify_object(record, None)
+        self.assertNotIn("project_id", result)
+        self.assertNotIn("updated_at", result)
+
+
+class TestUsersStream(unittest.TestCase):
+    """Tests for Users stream — now ChildBaseStream with updated_at from parent."""
+
+    def _make_stream(self):
+        from tap_gitlab.streams.users import Users
+        client = make_mock_client({})
+        catalog_entry = make_mock_catalog_entry()
+        return Users(client=client, catalog=catalog_entry)
+
+    def test_users_is_child_base_stream(self):
+        from tap_gitlab.streams.users import Users
+        from tap_gitlab.streams.abstracts import ChildBaseStream
+        self.assertTrue(issubclass(Users, ChildBaseStream))
+
+    def test_users_replication_method_is_incremental(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_method, "INCREMENTAL")
+
+    def test_users_replication_key_is_projects_updated_at(self):
+        stream = self._make_stream()
+        self.assertEqual(stream.replication_keys, ["projects_updated_at"])
+
+    def test_modify_object_sets_project_id_and_projects_updated_at_from_parent(self):
+        stream = self._make_stream()
+        parent = {"id": 99, "updated_at": "2026-06-15T08:00:00Z"}
+        record = {"id": 1, "username": "alice"}
+        result = stream.modify_object(record, parent)
+        self.assertEqual(result["project_id"], 99)
+        self.assertEqual(result["projects_updated_at"], "2026-06-15T08:00:00Z")
+
+    def test_modify_object_no_parent_returns_record_unchanged(self):
+        stream = self._make_stream()
+        record = {"id": 1, "username": "alice"}
+        result = stream.modify_object(record, None)
+        self.assertNotIn("project_id", result)
+        self.assertNotIn("updated_at", result)
