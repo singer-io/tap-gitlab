@@ -109,7 +109,7 @@ ERROR_CODE_EXCEPTION_MAPPING = {
     },
     403: {
         "raise_exception": ForbiddenError,
-        "message": "You are missing the following required scopes: read"
+        "message": "You are missing the required scopes"
     },
     404: {
         "raise_exception": NotFoundError,

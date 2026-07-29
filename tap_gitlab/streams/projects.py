@@ -57,6 +57,7 @@ class Projects(IncrementalStream):
 
         for project_id in project_ids:
             self._current_project_id = project_id
+            LOGGER.info(f"Syncing project: {project_id}")
             endpoint = self.get_url_endpoint()
             response = self.client.get(endpoint, self.params, self.headers, None)
 
