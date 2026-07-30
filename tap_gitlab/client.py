@@ -58,8 +58,17 @@ def raise_for_error(response: requests.Response) -> None:
     if response.status_code not in [200, 201, 204]:
         if response_json.get("error"):
             message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('error')}"
+            if response_json.get("error_description"):
+                message += f" - {response_json.get('error_description')}"
+        elif response_json.get("message"):
+            message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('message')}"
         else:
-            message = f"HTTP-error-code: {response.status_code}, Error: {response_json.get('message', ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get('message', 'Unknown Error'))}"
+            fallback = ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get('message', 'Unknown Error')
+            raw_body = getattr(response, 'text', None)
+            message = f"HTTP-error-code: {response.status_code}, Error: {fallback}"
+            if raw_body:
+                # Truncated error logs to 200 chars to avoid flooding logs with large HTML error pages
+                message += f" (Response body: {raw_body[:200]})"
         exc = ERROR_CODE_EXCEPTION_MAPPING.get(response.status_code, {}).get("raise_exception", Error)
         raise exc(message, response) from None
 
@@ -98,8 +107,7 @@ class Client:
 
     def check_api_credentials(self) -> None:
         """Verify API credentials by making a test request."""
-        headers = {}
-        params = {'private_token': self.config.get("private_token")}
+        headers, params = self.authenticate({}, {})
         endpoint = f"{self.base_url}/user"
 
         try:
@@ -124,7 +132,9 @@ class Client:
     def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
         """Authenticates the request using dynamic header/token keys."""
         params = params or {}
-        params['private_token'] = self.config.get("private_token")
+        private_token = self.config.get("private_token")
+        if private_token:
+            headers["PRIVATE-TOKEN"] = private_token
 
         if isinstance(headers, dict) and "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")

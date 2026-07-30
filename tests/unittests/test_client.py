@@ -185,3 +185,53 @@ class TestCheckApiCredentials(unittest.TestCase):
         # Raw urllib3 message must not be included to avoid token leakage
         self.assertNotIn("Failed to resolve", msg)
         self.assertNotIn("private_token", msg)
+
+
+class TestAuthenticate(unittest.TestCase):
+
+    def _make_client(self, config=None):
+        """Return a Client without triggering check_api_credentials."""
+        return Client(config if config is not None else {"private_token": "secret_token"})
+
+    def test_private_token_set_in_header(self):
+        """private_token must be sent in the PRIVATE-TOKEN header, not as a query param."""
+        client = self._make_client({"private_token": "secret_token"})
+        headers, params = client.authenticate({}, {})
+        self.assertEqual(headers.get("PRIVATE-TOKEN"), "secret_token")
+
+    def test_private_token_not_in_params(self):
+        """private_token must never appear in the query parameters."""
+        client = self._make_client({"private_token": "secret_token"})
+        headers, params = client.authenticate({}, {})
+        self.assertNotIn("private_token", params)
+
+    def test_no_private_token_in_config_leaves_header_unset(self):
+        """When private_token is absent from config the header must not be added."""
+        client = self._make_client({})
+        headers, params = client.authenticate({}, {})
+        self.assertNotIn("PRIVATE-TOKEN", headers)
+
+    def test_user_agent_added_to_headers_when_configured(self):
+        """user_agent in config must be forwarded as the User-Agent header."""
+        client = self._make_client({"private_token": "t", "user_agent": "my-tap/1.0"})
+        headers, params = client.authenticate({}, {})
+        self.assertEqual(headers.get("User-Agent"), "my-tap/1.0")
+
+    def test_existing_headers_are_preserved(self):
+        """authenticate() must not discard headers that were already set by the caller."""
+        client = self._make_client({"private_token": "secret_token"})
+        headers, params = client.authenticate({"Accept": "application/json"}, {})
+        self.assertEqual(headers.get("Accept"), "application/json")
+        self.assertEqual(headers.get("PRIVATE-TOKEN"), "secret_token")
+
+    @patch("requests.Session.get")
+    def test_request_uses_header_not_param(self, mock_get):
+        """End-to-end: an actual GET must carry PRIVATE-TOKEN in the header, not in the URL."""
+        mock_get.return_value = get_mock_response(200, {"id": 1, "username": "tester"})
+        client = self._make_client({"private_token": "secret_token"})
+        client.check_api_credentials()
+        _, call_kwargs = mock_get.call_args
+        sent_headers = call_kwargs.get("headers", {})
+        sent_params = call_kwargs.get("params", {})
+        self.assertEqual(sent_headers.get("PRIVATE-TOKEN"), "secret_token")
+        self.assertNotIn("private_token", sent_params)
