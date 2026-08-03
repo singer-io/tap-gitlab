@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from tap_gitlab.exceptions import ForbiddenError
 
 LOGGER = get_logger()
+LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
 
 
 class BaseStream(ABC):
@@ -160,7 +161,15 @@ class IncrementalStream(BaseStream):
             state, stream, bookmark_key, self.client.config["start_date"]
         )
         try:
-            value = max(current_bookmark, value)
+            current_dt = self._to_utc_datetime(current_bookmark)
+            value_dt = self._to_utc_datetime(value)
+
+            if current_dt and value_dt:
+                value = max(current_dt, value_dt).isoformat(timespec='seconds').replace('+00:00', 'Z')
+            elif value_dt:
+                value = value_dt.isoformat(timespec='seconds').replace('+00:00', 'Z')
+            else:
+                value = current_bookmark
         except Exception:
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
@@ -178,14 +187,14 @@ class IncrementalStream(BaseStream):
             return None
         if isinstance(value, datetime):
             if value.tzinfo is None:
-                return value.replace(tzinfo=timezone.utc)
+                return value.replace(tzinfo=LOCAL_TIMEZONE).astimezone(timezone.utc)
             return value.astimezone(timezone.utc)
         if isinstance(value, (int, float)):
-            return datetime.fromtimestamp(value).replace(tzinfo=timezone.utc)
+            return datetime.fromtimestamp(value, tz=timezone.utc)
         if isinstance(value, str):
             dt = parser.parse(value)
             if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
+                dt = dt.replace(tzinfo=LOCAL_TIMEZONE)
             return dt.astimezone(timezone.utc)
         LOGGER.warning(f"Unsupported timestamp type: {type(value)}")
         return None
@@ -218,6 +227,12 @@ class IncrementalStream(BaseStream):
                 if record_timestamp is None:
                     LOGGER.warning(f"Skipping record with invalid {self.replication_keys[0]}: {record_value}")
                     continue
+
+                # Normalize replication key values to UTC with explicit timezone
+                # so emitted records and saved state are compared consistently.
+                transformed_record[self.replication_keys[0]] = (
+                    record_timestamp.isoformat(timespec='microseconds').replace('+00:00', 'Z')
+                )
 
                 if record_timestamp >= bookmark_date:
                     if self.is_selected():
