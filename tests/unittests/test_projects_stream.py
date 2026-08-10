@@ -267,7 +267,7 @@ class TestProjectsParentBookmark(unittest.TestCase):
 
 
 class TestGroupsStreamIndependence(unittest.TestCase):
-
+    """Tests for Groups stream — should not call Projects or accumulate project IDs."""
     def test_groups_sync_does_not_call_projects(self):
         from tap_gitlab.streams.groups import Groups
         client = make_mock_client({"groups": "100"})

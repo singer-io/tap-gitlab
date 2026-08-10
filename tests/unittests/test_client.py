@@ -1,10 +1,23 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from datetime import datetime
 import requests
-from tap_gitlab.client import Client
-from tap_gitlab.exceptions import BackoffError, Error
+from tap_gitlab.client import Client, raise_for_error, wait_if_retry_after
+from tap_gitlab.exceptions import (
+    BackoffError, Error,
+    BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError,
+    RateLimitError, InternalServerError,
+)
 from requests.exceptions import ConnectionError, Timeout, ChunkedEncodingError
+
+
+def _mock_response(status_code, json_data=None, headers=None, text=""):
+    resp = MagicMock(spec=requests.Response)
+    resp.status_code = status_code
+    resp.json.return_value = json_data or {}
+    resp.headers = headers or {}
+    resp.text = text
+    return resp
 
 class MockResponse:
     """Mock response object class."""
@@ -235,3 +248,218 @@ class TestAuthenticate(unittest.TestCase):
         sent_params = call_kwargs.get("params", {})
         self.assertEqual(sent_headers.get("PRIVATE-TOKEN"), "secret_token")
         self.assertNotIn("private_token", sent_params)
+
+
+class TestRaiseForError(unittest.TestCase):
+
+    def test_200_does_not_raise(self):
+        resp = _mock_response(200, {"id": 1})
+        raise_for_error(resp)  # should not raise
+
+    def test_400_raises_bad_request(self):
+        resp = _mock_response(400, {"message": "bad"})
+        with self.assertRaises(BadRequestError):
+            raise_for_error(resp)
+
+    def test_401_raises_unauthorized(self):
+        resp = _mock_response(401, {"message": "unauthorized"})
+        with self.assertRaises(UnauthorizedError):
+            raise_for_error(resp)
+
+    def test_403_raises_forbidden(self):
+        resp = _mock_response(403, {"message": "forbidden"})
+        with self.assertRaises(ForbiddenError):
+            raise_for_error(resp)
+
+    def test_404_raises_not_found(self):
+        resp = _mock_response(404, {"message": "not found"})
+        with self.assertRaises(NotFoundError):
+            raise_for_error(resp)
+
+    def test_500_raises_internal_server_error(self):
+        resp = _mock_response(500, {"message": "server error"})
+        with self.assertRaises(InternalServerError):
+            raise_for_error(resp)
+
+    def test_error_field_used_over_message(self):
+        resp = _mock_response(400, {"error": "invalid_token", "error_description": "Token expired"})
+        with self.assertRaises(BadRequestError) as ctx:
+            raise_for_error(resp)
+        self.assertIn("invalid_token", str(ctx.exception))
+        self.assertIn("Token expired", str(ctx.exception))
+
+    def test_error_field_without_description(self):
+        resp = _mock_response(400, {"error": "invalid_request"})
+        with self.assertRaises(BadRequestError) as ctx:
+            raise_for_error(resp)
+        self.assertIn("invalid_request", str(ctx.exception))
+
+    def test_response_body_included_in_fallback_message(self):
+        resp = _mock_response(503, {}, text="Service Unavailable")
+        resp.json.side_effect = ValueError("no json")
+        with self.assertRaises(Error):
+            raise_for_error(resp)
+
+    def test_json_parse_failure_falls_back_gracefully(self):
+        resp = _mock_response(400, text="<html>error</html>")
+        resp.json.side_effect = ValueError("no JSON")
+        with self.assertRaises(BadRequestError):
+            raise_for_error(resp)
+
+    def test_unknown_status_code_raises_generic_error(self):
+        resp = _mock_response(418, {"message": "teapot"})
+        with self.assertRaises(Error):
+            raise_for_error(resp)
+
+
+class TestWaitIfRetryAfter(unittest.TestCase):
+
+    def test_non_rate_limit_exception_returns_60(self):
+        exc = Exception("generic")
+        result = wait_if_retry_after(exc)
+        self.assertEqual(result, 60)
+
+    def test_rate_limit_exception_returns_retry_after(self):
+        resp = MagicMock()
+        resp.headers = {"Retry-After": "30"}
+        exc = RateLimitError(response=resp)
+        result = wait_if_retry_after(exc)
+        self.assertEqual(result, 30)
+
+    def test_rate_limit_no_retry_after_defaults_to_60(self):
+        resp = MagicMock()
+        resp.headers = {}
+        exc = RateLimitError(response=resp)
+        result = wait_if_retry_after(exc)
+        self.assertEqual(result, 60)
+
+    def test_dict_style_exception_info(self):
+        exc = Exception("generic")
+        result = wait_if_retry_after({"exception": exc})
+        self.assertEqual(result, 60)
+
+    def test_rate_limit_with_limit_remaining_logs(self):
+        resp = MagicMock()
+        resp.headers = {
+            "ratelimit-limit": "1000",
+            "ratelimit-remaining": "0",
+            "Retry-After": "45",
+        }
+        exc = RateLimitError(response=resp)
+        result = wait_if_retry_after(exc)
+        self.assertEqual(result, 45)
+
+
+class TestClientPaginate(unittest.TestCase):
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_paginate_single_page_list(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        mock_resp = MagicMock(spec=requests.Response)
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = [{"id": 1}, {"id": 2}]
+        mock_resp.headers = {}
+        with patch.object(client._session, "get", return_value=mock_resp):
+            result = client.paginate("/projects")
+        self.assertEqual(result, [{"id": 1}, {"id": 2}])
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_paginate_multi_page(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        page1 = MagicMock(spec=requests.Response)
+        page1.status_code = 200
+        page1.json.return_value = [{"id": 1}]
+        page1.headers = {"X-Next-Page": "2"}
+        page2 = MagicMock(spec=requests.Response)
+        page2.status_code = 200
+        page2.json.return_value = [{"id": 2}]
+        page2.headers = {}
+        with patch.object(client._session, "get", side_effect=[page1, page2]):
+            result = client.paginate("/projects")
+        self.assertEqual(result, [{"id": 1}, {"id": 2}])
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_paginate_dict_response_appended(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        mock_resp = MagicMock(spec=requests.Response)
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"id": 99, "name": "project"}
+        mock_resp.headers = {}
+        with patch.object(client._session, "get", return_value=mock_resp):
+            result = client.paginate("/projects/99")
+        self.assertEqual(result, [{"id": 99, "name": "project"}])
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_request_timeout_from_config(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com", "request_timeout": "120"}
+        client = Client(config)
+        self.assertEqual(client.request_timeout, 120.0)
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_default_request_timeout(self, mock_creds):
+        from tap_gitlab.client import REQUEST_TIMEOUT
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        self.assertEqual(client.request_timeout, REQUEST_TIMEOUT)
+
+    def test_check_api_credentials_raises_connection_error_on_unreachable_host(self):
+        from requests.exceptions import ConnectionError as ReqConnError
+        from requests import session as req_session
+        config = {"private_token": "tok", "api_url": "https://gitlab.example.invalid"}
+        client = Client.__new__(Client)
+        client.config = config
+        client.base_url = "https://gitlab.example.invalid/api/v4"
+        client.request_timeout = 5
+        client._session = req_session()
+        with patch.object(client._session, "get", side_effect=ReqConnError("unreachable")):
+            with self.assertRaises(ReqConnError):
+                client.check_api_credentials()
+
+    def test_check_api_credentials_logs_user_on_success(self):
+        from requests import session as req_session
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client.__new__(Client)
+        client.config = config
+        client.base_url = "https://gitlab.com/api/v4"
+        client.request_timeout = 300
+        client._session = req_session()
+        mock_resp = MagicMock(spec=requests.Response)
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"username": "testuser"}
+        mock_resp.headers = {}
+        with patch.object(client._session, "get", return_value=mock_resp):
+            client.check_api_credentials()  # should not raise
+
+
+class TestClientPost(unittest.TestCase):
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_post_returns_json_response(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        mock_resp = MagicMock(spec=requests.Response)
+        mock_resp.status_code = 201
+        mock_resp.json.return_value = {"id": 99}
+        mock_resp.headers = {}
+        with patch.object(client._session, "request", return_value=mock_resp):
+            result = client.post(
+                endpoint="https://gitlab.com/api/v4/projects",
+                params={}, headers={}, body={"name": "test"}
+            )
+        self.assertEqual(result, {"id": 99})
+
+    @patch("tap_gitlab.client.Client.check_api_credentials")
+    def test_post_uses_path_when_no_endpoint(self, mock_creds):
+        config = {"private_token": "tok", "api_url": "https://gitlab.com"}
+        client = Client(config)
+        mock_resp = MagicMock(spec=requests.Response)
+        mock_resp.status_code = 201
+        mock_resp.json.return_value = {"id": 5}
+        mock_resp.headers = {}
+        with patch.object(client._session, "request", return_value=mock_resp) as mock_req:
+            client.post(endpoint="", params={}, headers={}, body={"title": "test"}, path="projects")
+        call_url = mock_req.call_args[0][1]
+        self.assertIn("projects", call_url)

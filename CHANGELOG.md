@@ -1,9 +1,12 @@
 # Changelog
 
-# 1.2.0
+# 2.0.0
   * `projects` now independently fetches, merges, and deduplicates project IDs from configured groups. [#55](https://github.com/singer-io/tap-gitlab/pull/55)
   * Converted `branches` and `users` to incremental replication using the parent `project's` updated_at and updated their schemas accordingly. [#56](https://github.com/singer-io/tap-gitlab/pull/56)
+  * Updated Unittest cases
 
+# 1.1.2
+  * `projects` now independently fetches, merges, and deduplicates project IDs from configured groups. [#55](https://github.com/singer-io/tap-gitlab/pull/55)
 
 # 1.1.1
  * Moved the private token from query parameters to the `PRIVATE-TOKEN` request header for improved security. [#54](https://github.com/singer-io/tap-gitlab/pull/54)
