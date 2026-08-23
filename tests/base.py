@@ -43,9 +43,9 @@ class BaseTest(BaseCase):
             },
             "branches": {
                 cls.PRIMARY_KEYS: {"project_id", "name"},
-                cls.REPLICATION_METHOD: cls.FULL_TABLE,
-                cls.REPLICATION_KEYS: set(),
-                cls.OBEYS_START_DATE: False,
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: {"projects_updated_at"},
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 5
             },
             "commits": {
@@ -78,9 +78,9 @@ class BaseTest(BaseCase):
             },
             "users": {
                 cls.PRIMARY_KEYS: {"id", "project_id"},
-                cls.REPLICATION_METHOD: cls.FULL_TABLE,
-                cls.REPLICATION_KEYS: set(),
-                cls.OBEYS_START_DATE: False,
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: {"projects_updated_at"},
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 3
             },
             "groups": {

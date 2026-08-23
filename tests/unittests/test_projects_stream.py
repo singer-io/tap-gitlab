@@ -203,6 +203,54 @@ class TestGetRecords(unittest.TestCase):
         self.assertEqual(called_endpoint, "https://gitlab.com/api/v4/projects/10")
 
 
+class TestChildIncrementalSync(unittest.TestCase):
+    """Verify child streams use the parent timestamp without API filtering."""
+
+    def _make_stream(self, stream_class):
+        client = make_mock_client({
+            "start_date": "2026-01-01T00:00:00Z",
+            "projects": "10",
+        })
+        stream = stream_class(client=client, catalog=make_mock_catalog_entry())
+        stream.is_selected = lambda: True
+        return stream, client
+
+    def test_branches_do_not_send_updated_since(self):
+        from tap_gitlab.streams.branches import Branches
+
+        stream, _ = self._make_stream(Branches)
+        stream.get_records = lambda: iter([])
+        stream.sync({}, MagicMock(), {"id": 10, "updated_at": "2026-02-01T00:00:00Z"})
+
+        self.assertNotIn("updated_since", stream.params)
+
+    def test_users_do_not_send_updated_since(self):
+        from tap_gitlab.streams.users import Users
+
+        stream, _ = self._make_stream(Users)
+        stream.get_records = lambda: iter([])
+        stream.sync({}, MagicMock(), {"id": 10, "updated_at": "2026-02-01T00:00:00Z"})
+
+        self.assertNotIn("updated_since", stream.params)
+
+    def test_child_record_is_filtered_by_parent_timestamp(self):
+        from tap_gitlab.streams.branches import Branches
+
+        stream, _ = self._make_stream(Branches)
+        stream.get_records = lambda: iter([{"name": "main"}])
+        transformer = MagicMock()
+        transformer.transform.side_effect = lambda record, schema, metadata: record
+
+        with unittest.mock.patch("tap_gitlab.streams.abstracts.write_record") as write_record:
+            stream.sync(
+                {"bookmarks": {"branches": {"projects_updated_at": "2026-03-01T00:00:00Z"}}},
+                transformer,
+                {"id": 10, "updated_at": "2026-02-01T00:00:00Z"},
+            )
+
+        write_record.assert_not_called()
+
+
 class TestGroupsStreamIndependence(unittest.TestCase):
     """Verify Groups stream no longer has project-syncing logic."""
 
