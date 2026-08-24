@@ -81,6 +81,10 @@ class TestBranches(unittest.TestCase):
         stream = self._make()
         self.assertEqual(stream.parent, "projects")
 
+    def test_does_not_send_updated_since(self):
+        stream = self._make()
+        self.assertFalse(stream.send_updated_since)
+
 
 # ---------------------------------------------------------------------------
 # Commits
@@ -229,6 +233,10 @@ class TestUsers(unittest.TestCase):
     def test_parent(self):
         stream = self._make()
         self.assertEqual(stream.parent, "projects")
+
+    def test_does_not_send_updated_since(self):
+        stream = self._make()
+        self.assertFalse(stream.send_updated_since)
 
 
 # ---------------------------------------------------------------------------

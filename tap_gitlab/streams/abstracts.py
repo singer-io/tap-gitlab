@@ -118,6 +118,8 @@ class BaseStream(ABC):
 
 
 class IncrementalStream(BaseStream):
+    send_updated_since = True
+
     def get_bookmark(self, state: dict, stream: str, key: Any = None) -> int:
         return get_bookmark(  # pylint: disable=E1121
             state,
@@ -178,7 +180,8 @@ class IncrementalStream(BaseStream):
             bookmark_date = self._to_utc_datetime(self.client.config["start_date"])
 
         current_max_bookmark_date = bookmark_date
-        self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
+        if self.send_updated_since:
+            self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
         self.url_endpoint = self.get_url_endpoint(parent_obj)
 
         with metrics.record_counter(self.tap_stream_id) as counter:
@@ -278,6 +281,8 @@ class FullTableStream(BaseStream):
 
 class ChildBaseStream(IncrementalStream):
     """Base Class for Child Stream."""
+    send_updated_since = False
+
     def get_bookmark(self, state: Dict, stream: str, key: Any = None) -> int:
         """Singleton bookmark value for child streams."""
         if not self.bookmark_value:

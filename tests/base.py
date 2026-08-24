@@ -44,7 +44,7 @@ class BaseTest(BaseCase):
                 cls.PRIMARY_KEYS: {"project_id", "name"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
                 cls.REPLICATION_KEYS: {"projects_updated_at"},
-                cls.OBEYS_START_DATE: False,
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 5
             },
             "commits": {
@@ -79,7 +79,7 @@ class BaseTest(BaseCase):
                 cls.PRIMARY_KEYS: {"id", "project_id"},
                 cls.REPLICATION_METHOD: cls.INCREMENTAL,
                 cls.REPLICATION_KEYS: {'projects_updated_at'},
-                cls.OBEYS_START_DATE: False,
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 3
             },
             "groups": {
