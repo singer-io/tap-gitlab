@@ -13,7 +13,10 @@ from singer import (
 from dateutil import parser
 from datetime import datetime, timezone
 
+from tap_gitlab.exceptions import ForbiddenError, UnauthorizedError
+
 LOGGER = get_logger()
+LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
 
 
 class BaseStream(ABC):
@@ -31,8 +34,8 @@ class BaseStream(ABC):
     def __init__(self, client=None, catalog=None) -> None:
         self.client = client
         self.catalog = catalog
-        self.schema = self.catalog.schema.to_dict() if self.catalog else None
-        self.metadata = metadata.to_map(self.catalog.metadata) if self.catalog else None
+        self.schema = self.catalog.schema.to_dict() if self.catalog else {}
+        self.metadata = metadata.to_map(self.catalog.metadata) if self.catalog else {}
         self.child_to_sync = []
         self.params = {}
 
@@ -116,8 +119,33 @@ class BaseStream(ABC):
     def get_url_endpoint(self, parent_obj: Dict = None) -> str:
         return self.url_endpoint or f"{self.client.base_url}/{self.path}"
 
+    def check_access(self) -> bool:
+        """
+        Verify that the API credentials have read access to this stream.
+        Returns True if accessible, False if a 403 Forbidden error is raised.
+        Child streams always return True (access is governed by the parent check).
+        """
+        if self.parent:
+            return True
+
+        url = self.get_url_endpoint()
+        params = {"per_page": 1}
+
+        try:
+            self.client.get(url, params, self.headers, None)
+            return True
+        except (ForbiddenError, UnauthorizedError) as exc:
+            LOGGER.warning(
+                "Unauthorized Stream: %s, excluding from catalog. HTTP-Error-Message:'%s'",
+                self.tap_stream_id,
+                str(exc),
+            )
+            return False
+
 
 class IncrementalStream(BaseStream):
+    send_updated_since = True
+
     def get_bookmark(self, state: dict, stream: str, key: Any = None) -> int:
         return get_bookmark(  # pylint: disable=E1121
             state,
@@ -135,7 +163,15 @@ class IncrementalStream(BaseStream):
             state, stream, bookmark_key, self.client.config["start_date"]
         )
         try:
-            value = max(current_bookmark, value)
+            current_dt = self._to_utc_datetime(current_bookmark)
+            value_dt = self._to_utc_datetime(value)
+
+            if current_dt and value_dt:
+                value = max(current_dt, value_dt).isoformat(timespec='seconds').replace('+00:00', 'Z')
+            elif value_dt:
+                value = value_dt.isoformat(timespec='seconds').replace('+00:00', 'Z')
+            else:
+                value = current_bookmark
         except Exception:
             LOGGER.warning("Failed to compare bookmark values. Keeping current bookmark.")
             value = current_bookmark
@@ -153,14 +189,14 @@ class IncrementalStream(BaseStream):
             return None
         if isinstance(value, datetime):
             if value.tzinfo is None:
-                return value.replace(tzinfo=timezone.utc)
+                return value.replace(tzinfo=LOCAL_TIMEZONE).astimezone(timezone.utc)
             return value.astimezone(timezone.utc)
         if isinstance(value, (int, float)):
-            return datetime.fromtimestamp(value).replace(tzinfo=timezone.utc)
+            return datetime.fromtimestamp(value, tz=timezone.utc)
         if isinstance(value, str):
             dt = parser.parse(value)
             if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
+                dt = dt.replace(tzinfo=LOCAL_TIMEZONE)
             return dt.astimezone(timezone.utc)
         LOGGER.warning(f"Unsupported timestamp type: {type(value)}")
         return None
@@ -178,7 +214,8 @@ class IncrementalStream(BaseStream):
             bookmark_date = self._to_utc_datetime(self.client.config["start_date"])
 
         current_max_bookmark_date = bookmark_date
-        self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
+        if self.send_updated_since:
+            self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
         self.url_endpoint = self.get_url_endpoint(parent_obj)
 
         with metrics.record_counter(self.tap_stream_id) as counter:
@@ -193,6 +230,12 @@ class IncrementalStream(BaseStream):
                 if record_timestamp is None:
                     LOGGER.warning(f"Skipping record with invalid {self.replication_keys[0]}: {record_value}")
                     continue
+
+                # Normalize replication key values to UTC with explicit timezone
+                # so emitted records and saved state are compared consistently.
+                transformed_record[self.replication_keys[0]] = (
+                    record_timestamp.isoformat(timespec='microseconds').replace('+00:00', 'Z')
+                )
 
                 if record_timestamp >= bookmark_date:
                     if self.is_selected():
@@ -214,6 +257,34 @@ class IncrementalStream(BaseStream):
                 value=current_max_bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z')
             )
             return counter.value
+
+
+class ParentBaseStream(IncrementalStream):
+    """Incremental parent stream that owns child stream bookmarks."""
+
+    def get_bookmark(self, state: dict, stream: str, key: Any = None):
+        min_bookmark = super().get_bookmark(state, stream) if self.is_selected() else None
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+
+        for child in self.child_to_sync:
+            child_bookmark = super().get_bookmark(
+                state, child.tap_stream_id, key=bookmark_key
+            )
+            min_bookmark = min(min_bookmark, child_bookmark) if min_bookmark else child_bookmark
+
+        return min_bookmark or self.client.config["start_date"]
+
+    def update_bookmark_state(self, state: dict, stream: str, key: Any = None, value: Any = None) -> Dict:
+        if self.is_selected():
+            super().update_bookmark_state(state, stream, key=key, value=value)
+
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+        for child in self.child_to_sync:
+            super().update_bookmark_state(
+                state, child.tap_stream_id, key=bookmark_key, value=value
+            )
+
+        return state
 
 class FullTableStream(BaseStream):
     """Base Class for FullTable Stream."""
@@ -245,6 +316,8 @@ class FullTableStream(BaseStream):
 
 class ChildBaseStream(IncrementalStream):
     """Base Class for Child Stream."""
+    send_updated_since = False
+
     def get_bookmark(self, state: Dict, stream: str, key: Any = None) -> int:
         """Singleton bookmark value for child streams."""
         if not self.bookmark_value:

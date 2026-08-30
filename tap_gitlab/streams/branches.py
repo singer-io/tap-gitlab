@@ -1,14 +1,14 @@
 from typing import Dict, Any
 from urllib.parse import quote
-from tap_gitlab.streams.abstracts import FullTableStream
+from tap_gitlab.streams.abstracts import ChildBaseStream
 
 
-class Branches(FullTableStream):
+class Branches(ChildBaseStream):
     tap_stream_id = "branches"
     key_properties = ["project_id", "name"]
-    replication_method = "FULL_TABLE"
+    replication_method = "INCREMENTAL"
     parent = "projects"
-    replication_keys = None
+    replication_keys = ["projects_updated_at"]
     path = "projects/{}/repository/branches"
     data_key = None
 
@@ -30,9 +30,9 @@ class Branches(FullTableStream):
         return endpoint
 
     def modify_object(self, record, parent_record=None):
-        """Adding project_id and last_committed_date to the record"""
-        if isinstance(record, dict):
-            if parent_record and isinstance(parent_record, dict):
-                record["project_id"] = parent_record.get("id")
+        """Add project_id and the parent project's update timestamp."""
+        if isinstance(record, dict) and isinstance(parent_record, dict):
+            record["project_id"] = parent_record.get("id")
+            record["projects_updated_at"] = parent_record.get("updated_at")
 
         return record

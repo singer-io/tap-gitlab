@@ -18,6 +18,7 @@ class BaseTest(BaseCase):
     in tap-tester tests. Shared tap-specific methods (as needed).
     """
     start_date = "2019-01-01T00:00:00Z"
+    IS_FORBIDDEN_STREAM = "is-forbidden-stream"
 
     @staticmethod
     def tap_name():
@@ -42,9 +43,9 @@ class BaseTest(BaseCase):
             },
             "branches": {
                 cls.PRIMARY_KEYS: {"project_id", "name"},
-                cls.REPLICATION_METHOD: cls.FULL_TABLE,
-                cls.REPLICATION_KEYS: set(),
-                cls.OBEYS_START_DATE: False,
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: {"projects_updated_at"},
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 5
             },
             "commits": {
@@ -77,9 +78,9 @@ class BaseTest(BaseCase):
             },
             "users": {
                 cls.PRIMARY_KEYS: {"id", "project_id"},
-                cls.REPLICATION_METHOD: cls.FULL_TABLE,
-                cls.REPLICATION_KEYS: set(),
-                cls.OBEYS_START_DATE: False,
+                cls.REPLICATION_METHOD: cls.INCREMENTAL,
+                cls.REPLICATION_KEYS: {"projects_updated_at"},
+                cls.OBEYS_START_DATE: True,
                 cls.API_LIMIT: 3
             },
             "groups": {
@@ -89,6 +90,14 @@ class BaseTest(BaseCase):
                 cls.OBEYS_START_DATE: False,
                 cls.API_LIMIT: 2
             }
+        }
+
+    def expected_stream_names(self):
+        """The expected stream names and exclude forbidden streams."""
+        return {
+            stream_name
+            for stream_name, metadata in self.expected_metadata().items()
+            if not metadata.get(self.IS_FORBIDDEN_STREAM, False)
         }
 
     @staticmethod

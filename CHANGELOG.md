@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.2.0
+  * Streams returning 403 Forbidden during discovery are now excluded from the catalog; discovery fails only if none are accessible. [#52](https://github.com/singer-io/tap-gitlab/pull/52)
+  
 # 1.1.2
   * `projects` now independently fetches, merges, and deduplicates project IDs from configured groups. [#55](https://github.com/singer-io/tap-gitlab/pull/55)
 

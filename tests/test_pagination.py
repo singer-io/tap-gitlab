@@ -13,6 +13,7 @@ class PaginationTest(PaginationTest, BaseTest):
     def streams_to_test(self):
         # don't have enough data to test pagination
         streams_to_exclude = {
+            "groups",
             "group_milestones",
             "issues",
             "project_milestones"
