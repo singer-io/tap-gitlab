@@ -13,7 +13,7 @@ from singer import (
 from dateutil import parser
 from datetime import datetime, timezone
 
-from tap_gitlab.exceptions import ForbiddenError
+from tap_gitlab.exceptions import ForbiddenError, UnauthorizedError
 
 LOGGER = get_logger()
 LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
@@ -134,7 +134,7 @@ class BaseStream(ABC):
         try:
             self.client.get(url, params, self.headers, None)
             return True
-        except ForbiddenError as exc:
+        except (ForbiddenError, UnauthorizedError) as exc:
             LOGGER.warning(
                 "Unauthorized Stream: %s, excluding from catalog. HTTP-Error-Message:'%s'",
                 self.tap_stream_id,
