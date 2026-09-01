@@ -5,6 +5,7 @@ from tap_gitlab.streams.abstracts import ChildBaseStream
 
 class Users(ChildBaseStream):
     tap_stream_id = "users"
+    send_updated_since = False
     key_properties = ["id", "project_id"]
     replication_method = "INCREMENTAL"
     parent = "projects"

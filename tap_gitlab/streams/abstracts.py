@@ -281,7 +281,6 @@ class FullTableStream(BaseStream):
 
 class ChildBaseStream(IncrementalStream):
     """Base Class for Child Stream."""
-    send_updated_since = False
 
     def get_bookmark(self, state: Dict, stream: str, key: Any = None) -> int:
         """Singleton bookmark value for child streams."""

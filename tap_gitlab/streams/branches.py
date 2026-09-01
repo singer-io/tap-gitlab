@@ -5,6 +5,7 @@ from tap_gitlab.streams.abstracts import ChildBaseStream
 
 class Branches(ChildBaseStream):
     tap_stream_id = "branches"
+    send_updated_since = False
     key_properties = ["project_id", "name"]
     replication_method = "INCREMENTAL"
     parent = "projects"
