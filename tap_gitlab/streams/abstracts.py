@@ -118,6 +118,8 @@ class BaseStream(ABC):
 
 
 class IncrementalStream(BaseStream):
+    send_updated_since = True
+
     def get_bookmark(self, state: dict, stream: str, key: Any = None) -> int:
         return get_bookmark(  # pylint: disable=E1121
             state,
@@ -178,7 +180,8 @@ class IncrementalStream(BaseStream):
             bookmark_date = self._to_utc_datetime(self.client.config["start_date"])
 
         current_max_bookmark_date = bookmark_date
-        self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
+        if self.send_updated_since:
+            self.update_params(updated_since=bookmark_date.isoformat(timespec='seconds').replace('+00:00', 'Z'))
         self.url_endpoint = self.get_url_endpoint(parent_obj)
 
         with metrics.record_counter(self.tap_stream_id) as counter:
@@ -215,6 +218,39 @@ class IncrementalStream(BaseStream):
             )
             return counter.value
 
+class ParentBaseStream(IncrementalStream):
+    """Base class for streams that own the bookmark of their child streams.
+    """
+
+    def get_bookmark(self, state: dict, stream: str, key: Any = None):
+        """Return min(parent_bookmark, child_1_bookmark, …).
+        """
+        min_bookmark = super().get_bookmark(state, stream) if self.is_selected() else None
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+
+        for child in self.child_to_sync:
+            child_bookmark = super().get_bookmark(
+                state, child.tap_stream_id, key=bookmark_key
+            )
+            min_bookmark = min(min_bookmark, child_bookmark) if min_bookmark else child_bookmark
+
+        return min_bookmark or self.client.config["start_date"]
+
+    def update_bookmark_state(self, state: dict, stream: str, key: Any = None, value: Any = None) -> Dict:
+        """Advance parent bookmark and write the same value to all child streams.
+        """
+        if self.is_selected():
+            super().update_bookmark_state(state, stream, key=key, value=value)
+
+        bookmark_key = f"{self.tap_stream_id}_{self.replication_keys[0]}"
+        for child in self.child_to_sync:
+            super().update_bookmark_state(
+                state, child.tap_stream_id, key=bookmark_key, value=value
+            )
+
+        return state
+
+
 class FullTableStream(BaseStream):
     """Base Class for FullTable Stream."""
 
@@ -245,6 +281,7 @@ class FullTableStream(BaseStream):
 
 class ChildBaseStream(IncrementalStream):
     """Base Class for Child Stream."""
+
     def get_bookmark(self, state: Dict, stream: str, key: Any = None) -> int:
         """Singleton bookmark value for child streams."""
         if not self.bookmark_value:

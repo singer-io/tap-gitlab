@@ -13,6 +13,13 @@
                 "integer"
             ]
         },
+        "projects_updated_at": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date-time"
+        },
         "username": {
             "type": [
                 "null",

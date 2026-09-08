@@ -24,15 +24,25 @@ jobs:
             uv pip install pylint
             pylint tap_gitlab -d C,R,W
       - run:
-          name: "Unit Tests"
+          name: "Unit Tests & Coverage Run"
           command: |
             source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
             uv pip install pytest coverage parameterized
-            coverage run -m pytest tests/unittests
+            coverage run --source=tap_gitlab -m pytest tests/unittests
             coverage html
           when: always
       - store_test_results:
           path: test_output/report.xml
+      - store_artifacts:
+          path: htmlcov
+      - run:
+          name: 'Coverage Report'
+          command: |
+            source /usr/local/share/virtualenvs/tap-gitlab/bin/activate
+            coverage report -m --fail-under=99
+            coverage html
+      - store_test_results:
+          path: test_output
       - store_artifacts:
           path: htmlcov
       - run:
